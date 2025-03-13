@@ -9,6 +9,7 @@ import { Button } from "@/components/Button"
 import { Card } from "@/components/Card"
 import { Input } from "@/components/Input"
 import { Select, SelectContent, SelectGroup, SelectGroupLabel, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
+import { Textarea } from "@/components/Textarea"
 import { RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, RiArrowLeftLine, RiArticleLine, RiBold, RiCalendarEventLine, RiCheckLine, RiDeleteBinLine, RiDragMove2Line, RiImage2Line, RiItalic, RiLink, RiListOrdered, RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, RiSendPlaneLine, RiUnderline } from "@remixicon/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
@@ -269,7 +270,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
             setHtmlContent(value);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value, htmlContent]);
+    }, [value, htmlContent, parseInitialStyles]);
 
     // Parse initial styles from content
     const parseInitialStyles = (content: string) => {
@@ -851,7 +852,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
             document.removeEventListener('selectionchange', handleSelectionChange);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [checkFormatting]);
 
     // Handle content changes
     const handleContentChange = () => {
