@@ -1,46 +1,13 @@
-// Add this at the very top of the file, before any other code
-// @ts-nocheck
-/* eslint-disable @next/next/no-img-element */
-
 "use client"
 
-// At the top of the file, in the imports section
 import { Button } from "@/components/Button"
 import { Card } from "@/components/Card"
 import { Input } from "@/components/Input"
-import { Select, SelectContent, SelectGroup, SelectGroupLabel, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
 import { Textarea } from "@/components/Textarea"
-import { RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, RiArrowLeftLine, RiArticleLine, RiBold, RiCalendarEventLine, RiCheckLine, RiDeleteBinLine, RiDragMove2Line, RiImage2Line, RiItalic, RiLink, RiListOrdered, RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, RiSendPlaneLine, RiUnderline } from "@remixicon/react"
+import { RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, RiArrowLeftLine, RiBold, RiCheckLine, RiDeleteBinLine, RiDragMove2Line, RiEditLine, RiEyeLine, RiItalic, RiLink, RiListOrdered, RiListUnordered, RiMarkPenLine, RiSave3Line, RiSendPlaneLine, RiUnderline } from "@remixicon/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-
-// Custom Tooltip component
-const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
-    const [isVisible, setIsVisible] = useState(false);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    const showTooltip = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => setIsVisible(true), 300);
-    };
-
-    const hideTooltip = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setIsVisible(false);
-    };
-
-    return (
-        <div className="relative inline-block" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
-            {children}
-            {isVisible && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-50">
-                    {content}
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-                </div>
-            )}
-        </div>
-    );
-};
 
 // Font options
 const fontFamilies = [
@@ -53,63 +20,6 @@ const fontFamilies = [
     { value: 'Courier New, monospace', label: 'Courier New' }
 ];
 
-// Mock content items for content link dropdown
-const contentItems = [
-    {
-        id: 'c1',
-        title: 'How to Improve Customer Engagement',
-        description: 'Learn effective strategies to boost customer engagement and retention through personalized communication.',
-        image: 'https://placehold.co/600x300/4f46e5/ffffff?text=Customer+Engagement',
-        url: '/blog/customer-engagement'
-    },
-    {
-        id: 'c2',
-        title: 'Email Marketing Best Practices',
-        description: 'Discover the latest best practices in email marketing to increase open rates and conversions.',
-        image: 'https://placehold.co/600x300/0ea5e9/ffffff?text=Email+Marketing',
-        url: '/blog/email-marketing'
-    },
-    {
-        id: 'c3',
-        title: 'Product Update: New Features',
-        description: 'Explore the exciting new features we have added to our platform to enhance your experience.',
-        image: 'https://placehold.co/600x300/10b981/ffffff?text=Product+Update',
-        url: '/updates/new-features'
-    }
-];
-
-// Mock events for event link dropdown
-const eventItems = [
-    {
-        id: 'e1',
-        title: 'Annual Customer Conference',
-        description: 'Join us for our annual customer conference featuring industry experts and networking opportunities.',
-        date: 'June 15-17, 2023',
-        location: 'San Francisco, CA',
-        image: 'https://placehold.co/600x300/f97316/ffffff?text=Annual+Conference',
-        url: '/events/annual-conference'
-    },
-    {
-        id: 'e2',
-        title: 'Product Webinar Series',
-        description: 'Learn how to maximize your productivity with our latest features in this interactive webinar.',
-        date: 'July 8, 2023',
-        location: 'Online',
-        image: 'https://placehold.co/600x300/ec4899/ffffff?text=Webinar+Series',
-        url: '/events/webinar-series'
-    },
-    {
-        id: 'e3',
-        title: 'Industry Roundtable Discussion',
-        description: 'Participate in our exclusive roundtable discussion with industry leaders on emerging trends.',
-        date: 'August 22, 2023',
-        location: 'New York, NY',
-        image: 'https://placehold.co/600x300/8b5cf6/ffffff?text=Roundtable',
-        url: '/events/roundtable'
-    }
-];
-
-// Font sizes
 const fontSizes = [
     { value: '8px', label: '8' },
     { value: '9px', label: '9' },
@@ -212,8 +122,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
     const [showFontColor, setShowFontColor] = useState(false);
     const [showBgColor, setShowBgColor] = useState(false);
     const [showHeadingMenu, setShowHeadingMenu] = useState(false);
-    // Set default text color based on section type
-    const [currentColor, setCurrentColor] = useState(sectionType === 'footer' ? '#6B7280' : '#000000');
+    const [currentColor, setCurrentColor] = useState('#000000');
     const [currentBgColor, setCurrentBgColor] = useState('transparent');
     const [currentFontFamily, setCurrentFontFamily] = useState(fontFamilies[0].value);
     const [isApplyingBgColor, setIsApplyingBgColor] = useState(false);
@@ -258,19 +167,42 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
             // Parse initial styles
             parseInitialStyles(value);
 
-            // Reset the initial render flag
-            isInitialRender.current = false;
+            // If it's the initial render and the content is empty, apply default styles
+            if (isInitialRender.current && (!value || value === '<p></p>' || value === '<p><br></p>' || value === '')) {
+                // Focus the editor to ensure commands work
+                editorRef.current.focus();
 
-            // Reset the updating content flag after a short delay
-            setTimeout(() => {
-                isUpdatingContent.current = false;
-            }, 0);
+                // Apply default font family
+                document.execCommand('fontName', false, currentFontFamily);
 
-            // Update the HTML content state
-            setHtmlContent(value);
+                // Apply default font size (using size 7 as a placeholder that we'll replace with our actual size)
+                document.execCommand('fontSize', false, '7');
+
+                // Get all font elements just created (they have size=7)
+                const fontElements = document.querySelectorAll('font[size="7"]');
+                fontElements.forEach(el => {
+                    // Replace the size attribute with a style
+                    el.removeAttribute('size');
+                    (el as HTMLElement).style.fontSize = currentFontSize;
+                });
+
+                // Apply default text color
+                document.execCommand('foreColor', false, currentColor);
+
+                // We intentionally don't apply a background color here
+                // to ensure no highlight color is selected by default
+
+                // Reset formatting states to ensure they're not selected by default
+                setIsBold(false);
+                setIsItalic(false);
+                setIsUnderline(false);
+            }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value, htmlContent, parseInitialStyles]);
+
+        // Reset flags
+        isUpdatingContent.current = false;
+        isInitialRender.current = false;
+    }, [value, htmlContent, currentFontFamily, currentFontSize, currentColor]);
 
     // Parse initial styles from content
     const parseInitialStyles = (content: string) => {
@@ -430,9 +362,9 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
             }
         }
 
-        // If no text color was found, use the default for the section type
+        // If no text color was found, default to black
         if (!foundTextColor) {
-            setCurrentColor(sectionType === 'footer' ? '#6B7280' : '#000000');
+            setCurrentColor('#000000');
         }
 
         // Check for background color
@@ -839,10 +771,10 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
         }
     };
 
-    // Add event listeners for selection changes
+    // Add event listener for selection change
     useEffect(() => {
         const handleSelectionChange = () => {
-            if (document.activeElement === editorRef.current) {
+            if (document.activeElement === editorRef.current && !isApplyingBgColor) {
                 checkFormatting();
             }
         };
@@ -851,8 +783,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
         return () => {
             document.removeEventListener('selectionchange', handleSelectionChange);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [checkFormatting]);
+    }, [isApplyingBgColor]);
 
     // Handle content changes
     const handleContentChange = () => {
@@ -1082,29 +1013,9 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
         // Focus the editor
         editorRef.current.focus();
 
-        // Apply the color
         document.execCommand('foreColor', false, color);
         setCurrentColor(color);
         setShowFontColor(false);
-
-        // If this is a footer section and we're initializing (not user selection),
-        // ensure all text is grey by default
-        if (sectionType === 'footer' && isInitialRender.current) {
-            // Select all text in the editor
-            const range = document.createRange();
-            range.selectNodeContents(editorRef.current);
-            const selection = window.getSelection();
-            if (selection) {
-                selection.removeAllRanges();
-                selection.addRange(range);
-
-                // Apply grey color to all text
-                document.execCommand('foreColor', false, '#6B7280');
-
-                // Clear selection
-                selection.removeAllRanges();
-            }
-        }
 
         handleContentChange();
     };
@@ -1363,36 +1274,28 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
         }
     };
 
-    // Function to handle clicks outside of sections
-    const handleOutsideClick = (e: React.MouseEvent) => {
-        // Check if the click is on the container but not on a section
-        if ((e.target as HTMLElement).classList.contains('email-content-container')) {
-            setEditingSection(null);
-            setIsEditingStyle(false);
-        }
-    };
-
     return (
         <div className={`rich-text-editor ${className || ''}`}>
             <div className="flex flex-wrap gap-1 mb-2 p-1 bg-gray-50 rounded-md dark:bg-gray-900">
                 {/* Font family dropdown - Google Docs style */}
                 <div className="relative">
-                    <Tooltip content="Font family">
-                        <Button
-                            variant="ghost"
-                            className={`h-8 px-2 py-0 text-sm flex items-center justify-between min-w-[100px] ${showFontFamily ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                            onClick={() => setShowFontFamily(!showFontFamily)}
-                        >
-                            <span style={{ fontFamily: currentFontFamily }}>{currentFontFamily.split(',')[0].replace(/['"]/g, '')}</span>
-                            <RiArrowDownSLine className="h-4 w-4 ml-1" />
-                        </Button>
-                    </Tooltip>
+                    <Button
+                        variant="ghost"
+                        className={`h-8 px-3 py-0 text-sm flex items-center justify-between min-w-[120px] ${showFontFamily ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                        onClick={() => setShowFontFamily(!showFontFamily)}
+                        style={{ fontFamily: currentFontFamily }}
+                    >
+                        <span className="truncate">
+                            {fontFamilies.find(f => f.value === currentFontFamily)?.label || 'Arial'}
+                        </span>
+                        <RiArrowDownSLine className="h-4 w-4 ml-1" />
+                    </Button>
                     {showFontFamily && (
                         <div className="absolute top-full left-0 mt-1 w-[200px] bg-white dark:bg-gray-950 shadow-lg rounded-md border border-gray-200 dark:border-gray-800 z-20 max-h-[300px] overflow-y-auto">
                             {fontFamilies.map((font) => (
                                 <button
                                     key={font.value}
-                                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 ${currentFontFamily === font.value ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
+                                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 ${currentFontFamily === font.value ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
                                     style={{ fontFamily: font.value }}
                                     onClick={() => applyFontFamily(font.value)}
                                 >
@@ -1405,16 +1308,14 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
 
                 {/* Font size dropdown - Google Docs style */}
                 <div className="relative">
-                    <Tooltip content="Font size">
-                        <Button
-                            variant="ghost"
-                            className={`h-8 px-2 py-0 text-sm flex items-center justify-between min-w-[60px] ${showFontSize ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                            onClick={() => setShowFontSize(!showFontSize)}
-                        >
-                            <span>{currentFontSize.replace('px', '')}</span>
-                            <RiArrowDownSLine className="h-4 w-4 ml-1" />
-                        </Button>
-                    </Tooltip>
+                    <Button
+                        variant="ghost"
+                        className={`h-8 px-2 py-0 text-sm flex items-center justify-between min-w-[60px] ${showFontSize ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                        onClick={() => setShowFontSize(!showFontSize)}
+                    >
+                        <span>{currentFontSize.replace('px', '')}</span>
+                        <RiArrowDownSLine className="h-4 w-4 ml-1" />
+                    </Button>
                     {showFontSize && (
                         <div className="absolute top-full left-0 mt-1 w-[80px] bg-white dark:bg-gray-950 shadow-lg rounded-md border border-gray-200 dark:border-gray-800 z-20 max-h-[300px] overflow-y-auto">
                             {fontSizes.map((size) => (
@@ -1433,49 +1334,45 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center"></div>
 
                 {/* Text formatting */}
-                <Tooltip content="Bold (Ctrl+B)">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${isBold ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('bold')}
-                    >
-                        <RiBold className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Italic (Ctrl+I)">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${isItalic ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('italic')}
-                    >
-                        <RiItalic className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Underline (Ctrl+U)">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${isUnderline ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('underline')}
-                    >
-                        <RiUnderline className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${isBold ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('bold')}
+                    title="Bold (Ctrl+B)"
+                >
+                    <RiBold className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${isItalic ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('italic')}
+                    title="Italic (Ctrl+I)"
+                >
+                    <RiItalic className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${isUnderline ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('underline')}
+                    title="Underline (Ctrl+U)"
+                >
+                    <RiUnderline className="h-4 w-4" />
+                </Button>
 
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center"></div>
 
                 {/* Font color dropdown - Google Docs style */}
                 <div className="relative">
                     <div className="flex items-center">
-                        <Tooltip content="Text color">
-                            <Button
-                                variant="ghost"
-                                className="h-8 w-8 p-0 flex items-center justify-center relative"
-                                onClick={() => applyFontColor(currentColor)}
-                            >
-                                <span className="font-bold text-lg" style={{ color: currentColor }}>A</span>
-                                <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: currentColor }}></div>
-                            </Button>
-                        </Tooltip>
+                        <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 flex items-center justify-center relative"
+                            onClick={() => applyFontColor(currentColor)}
+                            title="Text color"
+                        >
+                            <span className="font-bold text-lg" style={{ color: currentColor }}>A</span>
+                            <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: currentColor }}></div>
+                        </Button>
                         <Button
                             variant="ghost"
                             className="h-8 w-4 p-0 flex items-center justify-center"
@@ -1525,20 +1422,6 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                                     ))}
                                 </div>
                             </div>
-                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                <div className="text-xs font-medium text-gray-500 mb-1">Custom Color</div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="color"
-                                        value={currentColor}
-                                        onChange={(e) => applyFontColor(e.target.value)}
-                                        className="w-8 h-8 cursor-pointer rounded-sm border border-gray-300"
-                                    />
-                                    <div className="text-sm text-gray-700 dark:text-gray-300">
-                                        {currentColor.toUpperCase()}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -1546,22 +1429,21 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 {/* Background color / Highlight dropdown - Google Docs style */}
                 <div className="relative">
                     <div className="flex items-center">
-                        <Tooltip content={currentBgColor === 'transparent' ? "No highlight color" : "Highlight color"}>
-                            <Button
-                                variant="ghost"
-                                className="h-8 w-8 p-0 flex items-center justify-center relative"
-                                onClick={() => applyBackgroundColor(currentBgColor)}
-                            >
-                                <RiMarkPenLine className={`h-4 w-4 ${currentBgColor === 'transparent' ? 'text-gray-500' : ''}`} />
-                                {currentBgColor !== 'transparent' && (
-                                    <div className="absolute bottom-0 left-0 right-0 h-1"
-                                        style={{
-                                            backgroundColor: currentBgColor
-                                        }}
-                                    ></div>
-                                )}
-                            </Button>
-                        </Tooltip>
+                        <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 flex items-center justify-center relative"
+                            onClick={() => applyBackgroundColor(currentBgColor)}
+                            title={currentBgColor === 'transparent' ? "No highlight color" : "Highlight color"}
+                        >
+                            <RiMarkPenLine className={`h-4 w-4 ${currentBgColor === 'transparent' ? 'text-gray-500' : ''}`} />
+                            {currentBgColor !== 'transparent' && (
+                                <div className="absolute bottom-0 left-0 right-0 h-1"
+                                    style={{
+                                        backgroundColor: currentBgColor
+                                    }}
+                                ></div>
+                            )}
+                        </Button>
                         <Button
                             variant="ghost"
                             className="h-8 w-4 p-0 flex items-center justify-center"
@@ -1582,21 +1464,6 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                                     ></button>
                                 ))}
                             </div>
-                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                <div className="text-xs font-medium text-gray-500 mb-1">Custom Color</div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="color"
-                                        value={currentBgColor === 'transparent' ? '#ffffff' : currentBgColor}
-                                        onChange={(e) => applyBackgroundColor(e.target.value)}
-                                        className="w-8 h-8 cursor-pointer rounded-sm border border-gray-300"
-                                        disabled={currentBgColor === 'transparent'}
-                                    />
-                                    <div className="text-sm text-gray-700 dark:text-gray-300">
-                                        {currentBgColor === 'transparent' ? 'No Color' : currentBgColor.toUpperCase()}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -1604,74 +1471,68 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center"></div>
 
                 {/* Text alignment */}
-                <Tooltip content="Align left">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'left' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('justifyLeft')}
-                    >
-                        <RiAlignLeft className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Align center">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'center' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('justifyCenter')}
-                    >
-                        <RiAlignCenter className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Align right">
-                    <Button
-                        variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'right' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
-                        onClick={() => execFormatCommand('justifyRight')}
-                    >
-                        <RiAlignRight className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${textAlign === 'left' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('justifyLeft')}
+                    title="Align left"
+                >
+                    <RiAlignLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${textAlign === 'center' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('justifyCenter')}
+                    title="Align center"
+                >
+                    <RiAlignCenter className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${textAlign === 'right' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                    onClick={() => execFormatCommand('justifyRight')}
+                    title="Align right"
+                >
+                    <RiAlignRight className="h-4 w-4" />
+                </Button>
 
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center"></div>
 
                 {/* List formatting */}
-                <Tooltip content="Bullet list">
-                    <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                        onClick={() => applyList('unordered')}
-                    >
-                        <RiListUnordered className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
-                <Tooltip content="Numbered list">
-                    <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                        onClick={() => applyList('ordered')}
-                    >
-                        <RiListOrdered className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
+                <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    onClick={() => applyList('unordered')}
+                    title="Bullet list"
+                >
+                    <RiListUnordered className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    onClick={() => applyList('ordered')}
+                    title="Numbered list"
+                >
+                    <RiListOrdered className="h-4 w-4" />
+                </Button>
 
                 <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center"></div>
 
                 {/* Link */}
-                <Tooltip content="Insert link">
-                    <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                        onClick={() => {
-                            const url = prompt('Enter link URL:');
-                            if (url) {
-                                document.execCommand('createLink', false, url);
-                                handleContentChange();
-                            }
-                        }}
-                    >
-                        <RiLink className="h-4 w-4" />
-                    </Button>
-                </Tooltip>
+                <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    onClick={() => {
+                        const url = prompt('Enter link URL:');
+                        if (url) {
+                            document.execCommand('createLink', false, url);
+                            handleContentChange();
+                        }
+                    }}
+                    title="Insert link"
+                >
+                    <RiLink className="h-4 w-4" />
+                </Button>
             </div>
             <div
                 ref={editorRef}
@@ -1685,8 +1546,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 style={{
                     backgroundColor: 'white',
                     fontSize: currentFontSize, // Explicitly set the font size
-                    fontFamily: currentFontFamily, // Explicitly set the font family
-                    color: sectionType === 'footer' ? '#6B7280' : currentColor // Set grey color for footer sections
+                    fontFamily: currentFontFamily // Explicitly set the font family
                 }}
                 spellCheck="false"
                 data-gramm="false"
@@ -1823,10 +1683,10 @@ const prebuiltTemplates = [
         subject: 'Welcome to our community!',
         thumbnail: '📧',
         sections: [
-            { id: 101, type: "header", content: "<h1 style='color: #4a86e8; font-weight: bold;'>Welcome to our community!</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 102, type: "text", content: "We're <strong>thrilled</strong> to have you join us. Here's everything you need to know to <em>get started</em>.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 103, type: "button", content: "Get Started", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'default' },
-            { id: 104, type: "footer", content: "© 2025 Your Company. All rights reserved.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 101, type: "header", content: "<h1 style='color: #4a86e8; font-weight: bold;'>Welcome to our community!</h1>" },
+            { id: 102, type: "text", content: "We're <strong>thrilled</strong> to have you join us. Here's everything you need to know to <em>get started</em>." },
+            { id: 103, type: "button", content: "Get Started", link: "#" },
+            { id: 104, type: "footer", content: "© 2025 Your Company. All rights reserved." }
         ]
     },
     {
@@ -1836,10 +1696,10 @@ const prebuiltTemplates = [
         subject: 'Important announcement',
         thumbnail: '📢',
         sections: [
-            { id: 201, type: "header", content: "<h2 style='color: #e74c3c; font-weight: bold;'>Important Announcement</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 202, type: "text", content: "We have some <strong>exciting news</strong> to share with you! Our <span style='color: #27ae60;'>new feature</span> is now available.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 203, type: "button", content: "Learn more", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'secondary', buttonSize: 'default' },
-            { id: 204, type: "footer", content: "© 2025 Your Company. All rights reserved.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 201, type: "header", content: "<h2 style='color: #e74c3c; font-weight: bold;'>Important Announcement</h2>" },
+            { id: 202, type: "text", content: "We have some <strong>exciting news</strong> to share with you! Our <span style='color: #27ae60;'>new feature</span> is now available." },
+            { id: 203, type: "button", content: "Learn more", link: "#" },
+            { id: 204, type: "footer", content: "© 2025 Your Company. All rights reserved." }
         ]
     },
     {
@@ -1849,10 +1709,10 @@ const prebuiltTemplates = [
         subject: 'Your monthly newsletter',
         thumbnail: '📰',
         sections: [
-            { id: 301, type: "header", content: "<h1 style='color: #9b59b6; font-weight: bold;'>Your Monthly Newsletter</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 302, type: "text", content: "<h3>This Month's Highlights:</h3><ul><li><strong>New Feature Launch</strong>: We've released our new dashboard.</li><li><strong>Community Spotlight</strong>: Meet our most active members.</li><li><strong>Upcoming Events</strong>: Don't miss our webinar next week.</li></ul>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 303, type: "button", content: "Read full newsletter", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'lg' },
-            { id: 304, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>You're receiving this email because you subscribed to our newsletter.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 301, type: "header", content: "<h1 style='color: #9b59b6; font-weight: bold;'>Your Monthly Newsletter</h1>" },
+            { id: 302, type: "text", content: "<h3>This Month's Highlights:</h3><ul><li><strong>New Feature Launch</strong>: We've released our new dashboard.</li><li><strong>Community Spotlight</strong>: Meet our most active members.</li><li><strong>Upcoming Events</strong>: Don't miss our webinar next week.</li></ul>" },
+            { id: 303, type: "button", content: "Read full newsletter", link: "#" },
+            { id: 304, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>You're receiving this email because you subscribed to our newsletter." }
         ]
     },
     {
@@ -1862,10 +1722,10 @@ const prebuiltTemplates = [
         subject: 'You\'re invited!',
         thumbnail: '🎉',
         sections: [
-            { id: 401, type: "header", content: "<h1 style='color: #f39c12; font-weight: bold;'>You're Invited!</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 402, type: "text", content: "Join us for our <strong>annual conference</strong> on <span style='background-color: #f8f9fa; padding: 2px 4px;'>June 15-17, 2025</span>. It's going to be an amazing event with speakers from around the world.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 403, type: "button", content: "RSVP now", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'destructive', buttonSize: 'default' },
-            { id: 404, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Location: Grand Hotel, 123 Main St, Anytown", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 401, type: "header", content: "<h1 style='color: #f39c12; font-weight: bold;'>You're Invited!</h1>" },
+            { id: 402, type: "text", content: "Join us for our <strong>annual conference</strong> on <span style='background-color: #f8f9fa; padding: 2px 4px;'>June 15-17, 2025</span>. It's going to be an amazing event with speakers from around the world." },
+            { id: 403, type: "button", content: "RSVP now", link: "#" },
+            { id: 404, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Location: Grand Hotel, 123 Main St, Anytown" }
         ]
     },
     {
@@ -1875,10 +1735,10 @@ const prebuiltTemplates = [
         subject: 'Your order confirmation',
         thumbnail: '✅',
         sections: [
-            { id: 501, type: "header", content: "<h2 style='color: #2ecc71; font-weight: bold;'>Order Confirmation</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 502, type: "text", content: "Thank you for your order! Your order <strong>#12345</strong> has been confirmed and is being processed.<br><br><span style='color: #7f8c8d;'>Order details:</span><br>1x Product A - $29.99<br>2x Product B - $39.98<br><strong>Total: $69.97</strong>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 503, type: "button", content: "Track order", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'default' },
-            { id: 504, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Questions? Contact our support team.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 501, type: "header", content: "<h2 style='color: #2ecc71; font-weight: bold;'>Order Confirmation</h2>" },
+            { id: 502, type: "text", content: "Thank you for your order! Your order <strong>#12345</strong> has been confirmed and is being processed.<br><br><span style='color: #7f8c8d;'>Order details:</span><br>1x Product A - $29.99<br>2x Product B - $39.98<br><strong>Total: $69.97</strong>" },
+            { id: 503, type: "button", content: "Track order", link: "#" },
+            { id: 504, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Questions? Contact our support team." }
         ]
     },
     {
@@ -1888,89 +1748,32 @@ const prebuiltTemplates = [
         subject: 'We value your feedback',
         thumbnail: '💬',
         sections: [
-            { id: 601, type: "header", content: "<h2 style='color: #3498db; font-weight: bold;'>We Value Your Feedback</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 602, type: "text", content: "We're constantly working to improve our service and would love to hear your thoughts. <strong>Your feedback</strong> helps us make our product better for everyone.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 603, type: "button", content: "Take our survey", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'ghost', buttonSize: 'default' },
-            { id: 604, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>This survey will take approximately 5 minutes to complete.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
+            { id: 601, type: "header", content: "<h2 style='color: #3498db; font-weight: bold;'>We Value Your Feedback</h2>" },
+            { id: 602, type: "text", content: "We're constantly working to improve our service and would love to hear your thoughts. <strong>Your feedback</strong> helps us make our product better for everyone." },
+            { id: 603, type: "button", content: "Take our survey", link: "#" },
+            { id: 604, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>This survey will take approximately 5 minutes to complete." }
         ]
     }
 ];
-
-// Define a Section type to fix type errors
-type Section = {
-    backgroundColor: string
-    textAlign: "left" | "center" | "right"
-    padding: string
-    margin: string
-    id: number
-    type: string
-    content: string
-    link?: string
-    buttonColor?: "primary" | "secondary" | "destructive" | "ghost" | "custom"
-    buttonSize?: string
-    height?: string
-    alt?: string
-    contentId?: string
-    eventId?: string
-    customButtonColor?: string
-    buttonAlign?: "left" | "center" | "right"
-    imageHeight?: string
-    imageAlt?: string
-    linkIcon?: string
-    description?: string
-    image?: string
-    date?: string
-    location?: string
-    ctaText?: string
-}
-
-// Add this function before the EmailTemplateBuilder component
-// Calculate contrast ratio to determine text color (black or white) based on background color
-const getContrastRatio = (hexColor: string): string => {
-    // Default to white text if no color or invalid color
-    if (!hexColor || hexColor === 'transparent') return 'white';
-
-    try {
-        // Remove # if present
-        const color = hexColor.replace('#', '');
-
-        // Convert hex to RGB
-        const r = parseInt(color.substring(0, 2), 16) || 0;
-        const g = parseInt(color.substring(2, 4), 16) || 0;
-        const b = parseInt(color.substring(4, 6), 16) || 0;
-
-        // Calculate relative luminance
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-        // Return black for light colors, white for dark colors
-        return luminance > 0.5 ? 'black' : 'white';
-    } catch (error) {
-        // Default to white on error
-        return 'white';
-    }
-};
 
 export default function EmailTemplateBuilder() {
     const router = useRouter()
     const [step, setStep] = useState<'select' | 'edit'>('select')
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
-    const [sections, setSections] = useState<Section[]>([])
-    const [subject, setSubject] = useState('')
-    const [editingSection, setEditingSection] = useState<number | null>(null)
-    const [isEditingStyle, setIsEditingStyle] = useState(false)
-    const [draggedSection, setDraggedSection] = useState<number | null>(null)
+    const [templateName, setTemplateName] = useState("")
+    const [subject, setSubject] = useState("")
+    const [isPreview, setIsPreview] = useState(false)
+
+    // Template sections
+    const [sections, setSections] = useState<Array<{ id: number, type: string, content: string, link?: string }>>([])
 
     const selectTemplate = (templateId: string) => {
         const template = prebuiltTemplates.find(t => t.id === templateId);
         if (template) {
             setSelectedTemplate(templateId);
-            setSections(template.sections.map(section => ({
-                ...section,
-                backgroundColor: section.backgroundColor || 'transparent',
-                textAlign: section.textAlign || 'left',
-                padding: section.padding || '1rem',
-                margin: section.margin || '0'
-            })));
+            setTemplateName(template.name);
+            setSubject(template.subject);
+            setSections([...template.sections]);
         }
     }
 
@@ -1984,25 +1787,11 @@ export default function EmailTemplateBuilder() {
         const newSection = {
             id: Date.now(),
             type,
-            content: type === "header" ? "<h1>New header</h1>" :
-                type === "text" ? "<p>New text block</p>" :
+            content: type === "header" ? "New header" :
+                type === "text" ? "New text block" :
                     type === "button" ? "Button text" :
-                        type === "image" ? "https://placehold.co/600x200/e2e8f0/1e293b?text=Image" :
-                            type === "spacer" ? "" :
-                                type === "content-link" ? "Link to content" :
-                                    type === "event-link" ? "Link to event" :
-                                        "<p>Footer content</p>",
-            link: type === "button" || type === "content-link" || type === "event-link" ? "#" : undefined,
-            backgroundColor: 'transparent',
-            textAlign: 'left' as 'left' | 'center' | 'right',
-            padding: type === "spacer" ? '2rem' : '1rem',
-            margin: '0',
-            buttonColor: type === "button" ? 'primary' as 'primary' : undefined,
-            buttonSize: type === "button" ? 'default' as 'default' : undefined,
-            buttonAlign: type === "button" ? 'center' as 'center' : undefined,
-            imageHeight: type === "image" ? '200px' : undefined,
-            imageAlt: type === "image" ? 'Image description' : undefined,
-            linkIcon: type === "content-link" ? 'article' : type === "event-link" ? 'calendar' : undefined
+                        "Footer content",
+            link: type === "button" ? "#" : undefined
         }
         setSections([...sections, newSection])
     }
@@ -2033,35 +1822,6 @@ export default function EmailTemplateBuilder() {
         } else {
             router.push("/experience-manager/communications");
         }
-    }
-
-    // Handle section drag start
-    const handleDragStart = (id: number) => {
-        setDraggedSection(id);
-    }
-
-    // Handle section drag over
-    const handleDragOver = (e: React.DragEvent, id: number) => {
-        e.preventDefault();
-        if (draggedSection === null || draggedSection === id) return;
-
-        // Find the indices of the dragged section and the target section
-        const draggedIndex = sections.findIndex(section => section.id === draggedSection);
-        const targetIndex = sections.findIndex(section => section.id === id);
-
-        if (draggedIndex === -1 || targetIndex === -1) return;
-
-        // Create a new array with the sections reordered
-        const newSections = [...sections];
-        const [removed] = newSections.splice(draggedIndex, 1);
-        newSections.splice(targetIndex, 0, removed);
-
-        setSections(newSections);
-    }
-
-    // Handle section drag end
-    const handleDragEnd = () => {
-        setDraggedSection(null);
     }
 
     // Function to render HTML content safely
@@ -2141,7 +1901,7 @@ export default function EmailTemplateBuilder() {
     // Template selection screen
     if (step === 'select') {
         return (
-            <div className="container mx-auto py-6" >
+            <div className="container mx-auto py-6">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" onClick={handleBack}>
@@ -2190,11 +1950,11 @@ export default function EmailTemplateBuilder() {
                         Customize template
                     </Button>
                 </div>
-            </div >
+            </div>
         );
     }
 
-    // WYSIWYG Template editing screen
+    // Template editing screen
     return (
         <div className="container mx-auto py-6">
             <div className="flex items-center justify-between mb-6">
@@ -2206,6 +1966,25 @@ export default function EmailTemplateBuilder() {
                     <h1 className="text-2xl font-semibold">Customize email template</h1>
                 </div>
                 <div className="flex gap-3">
+                    <div className="flex items-center border rounded-md overflow-hidden">
+                        <Button
+                            variant={!isPreview ? "primary" : "ghost"}
+                            className="rounded-none border-0"
+                            onClick={() => setIsPreview(false)}
+                        >
+                            <RiEditLine className="mr-2" />
+                            Edit
+                        </Button>
+                        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700"></div>
+                        <Button
+                            variant={isPreview ? "primary" : "ghost"}
+                            className="rounded-none border-0"
+                            onClick={() => setIsPreview(true)}
+                        >
+                            <RiEyeLine className="mr-2" />
+                            Preview
+                        </Button>
+                    </div>
                     <Button variant="ghost" className="border border-primary" onClick={handleSave}>
                         <RiSave3Line className="mr-2" />
                         Save template
@@ -2217,778 +1996,214 @@ export default function EmailTemplateBuilder() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-6">
-                {/* Sidebar with controls */}
-                <div className="col-span-12 lg:col-span-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Add elements</CardTitle>
-                            <CardDescription>Drag and drop elements into your template</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-3">
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("header")}>
-                                    <span className="text-xl mb-1">H</span>
-                                    <span className="text-sm">Header</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("text")}>
-                                    <span className="text-xl mb-1">T</span>
-                                    <span className="text-sm">Text</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("button")}>
-                                    <span className="text-xl mb-1">B</span>
-                                    <span className="text-sm">Button</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("image")}>
-                                    <RiImage2Line className="text-xl mb-1" />
-                                    <span className="text-sm">Image</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("spacer")}>
-                                    <span className="text-xl mb-1">—</span>
-                                    <span className="text-sm">Spacer</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("content-link")}>
-                                    <RiArticleLine className="text-xl mb-1" />
-                                    <span className="text-sm">Content link</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("event-link")}>
-                                    <RiCalendarEventLine className="text-xl mb-1" />
-                                    <span className="text-sm">Event link</span>
-                                </Button>
-                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("footer")}>
-                                    <span className="text-xl mb-1">F</span>
-                                    <span className="text-sm">Footer</span>
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Section style editor */}
-                    {editingSection !== null && isEditingStyle && (
-                        <Card className="mt-6">
-                            <CardHeader>
-                                <CardTitle>Section style</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {/* Background color */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Background color</label>
-                                    <div className="flex items-center">
-                                        <input
-                                            type="color"
-                                            value={sections.find(s => s.id === editingSection)?.backgroundColor === 'transparent'
-                                                ? '#ffffff'
-                                                : sections.find(s => s.id === editingSection)?.backgroundColor || '#ffffff'}
-                                            onChange={(e) => updateSection(editingSection, { backgroundColor: e.target.value })}
-                                            className="w-10 h-10 p-1 border rounded mr-2"
-                                        />
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => updateSection(editingSection, { backgroundColor: 'transparent' })}
-                                            className="text-xs"
-                                        >
-                                            Transparent
-                                        </Button>
-                                        <div className="text-sm text-gray-700 dark:text-gray-300 ml-2">
-                                            {sections.find(s => s.id === editingSection)?.backgroundColor === 'transparent'
-                                                ? 'Transparent'
-                                                : sections.find(s => s.id === editingSection)?.backgroundColor?.toUpperCase()}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Text alignment - Only show for non-button sections */}
-                                {sections.find(s => s.id === editingSection)?.type !== 'button' && (
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Text alignment</label>
-                                        <div className="flex gap-2">
-                                            <Button
-                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'left' ? 'primary' : 'ghost'}
-                                                size="sm"
-                                                onClick={() => updateSection(editingSection, { textAlign: 'left' })}
-                                                className="flex-1"
-                                            >
-                                                <RiAlignLeft className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'center' ? 'primary' : 'ghost'}
-                                                size="sm"
-                                                onClick={() => updateSection(editingSection, { textAlign: 'center' })}
-                                                className="flex-1"
-                                            >
-                                                <RiAlignCenter className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'right' ? 'primary' : 'ghost'}
-                                                size="sm"
-                                                onClick={() => updateSection(editingSection, { textAlign: 'right' })}
-                                                className="flex-1"
-                                            >
-                                                <RiAlignRight className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Padding control */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Padding</label>
-                                    <Select
-                                        value={sections.find(s => s.id === editingSection)?.padding || '1rem'}
-                                        onValueChange={(value) => updateSection(editingSection, { padding: value })}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select padding" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="0">None</SelectItem>
-                                            <SelectItem value="0.5rem">Small</SelectItem>
-                                            <SelectItem value="1rem">Medium</SelectItem>
-                                            <SelectItem value="1.5rem">Large</SelectItem>
-                                            <SelectItem value="2rem">Extra Large</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Margin control */}
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Margin</label>
-                                    <Select
-                                        value={sections.find(s => s.id === editingSection)?.margin || '0'}
-                                        onValueChange={(value) => updateSection(editingSection, { margin: value })}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select margin" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="0">None</SelectItem>
-                                            <SelectItem value="0.5rem">Small</SelectItem>
-                                            <SelectItem value="1rem">Medium</SelectItem>
-                                            <SelectItem value="1.5rem">Large</SelectItem>
-                                            <SelectItem value="2rem">Extra Large</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Delete section button */}
-                                <div className="pt-4 border-t">
-                                    <Button
-                                        variant="destructive"
-                                        className="w-full"
-                                        onClick={() => {
-                                            removeSection(editingSection);
-                                            setEditingSection(null);
-                                            setIsEditingStyle(false);
-                                        }}
-                                    >
-                                        <RiDeleteBinLine className="mr-2" />
-                                        Delete section
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Email subject line */}
-                    <Card className="mt-6">
-                        <CardHeader>
-                            <CardTitle>Email subject</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Input
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                placeholder="Enter email subject"
-                            />
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* WYSIWYG Email Content Area */}
-                <div className="col-span-12 lg:col-span-9">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle>Email content</CardTitle>
-                                <CardDescription>Edit your email directly</CardDescription>
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                Click on a section to edit its content. Use the style button to change appearance.
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="space-y-4 min-h-[600px] bg-white p-4 rounded-md border"
-                                onClick={(e) => {
-                                    // Only close sections if clicking directly on the container
-                                    if (e.target === e.currentTarget) {
-                                        setEditingSection(null);
-                                        setIsEditingStyle(false);
-                                    }
-                                }}
-                            >
+            {isPreview ? (
+                // Preview Mode
+                <div className="flex flex-col space-y-4 w-full">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">Preview</h2>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsPreview(!isPreview)}
+                        >
+                            {isPreview ? "Hide Preview" : "Show Preview"}
+                        </Button>
+                    </div>
+                    {isPreview && (
+                        <div className="border rounded-md p-4 bg-white">
+                            <div className="prose max-w-none">
                                 {sections.map((section) => (
-                                    <div
-                                        key={section.id}
-                                        className={`relative group hover:border hover:border-blue-400 transition-all ${editingSection === section.id ? 'ring-2 ring-blue-500' : 'border-transparent border'}`}
-                                        style={{
-                                            backgroundColor: section.backgroundColor !== 'transparent' ? section.backgroundColor : 'transparent',
-                                            padding: section.padding,
-                                            margin: section.margin,
-                                            textAlign: section.textAlign,
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingSection(section.id);
-                                        }}
-                                        draggable
-                                        onDragStart={() => handleDragStart(section.id)}
-                                        onDragOver={(e) => handleDragOver(e, section.id)}
-                                        onDragEnd={handleDragEnd}
-                                    >
-                                        {/* Section toolbar */}
-                                        <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 bg-white shadow-sm rounded-md border p-1 z-10">
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setEditingSection(section.id);
-                                                    setIsEditingStyle(!isEditingStyle);
-                                                }}
-                                                title="Edit style"
-                                            >
-                                                <RiPaintFill className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    removeSection(section.id);
-                                                    setEditingSection(null);
-                                                }}
-                                                title="Delete section"
-                                            >
-                                                <RiDeleteBinLine className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0 cursor-grab"
-                                                title="Drag to reorder"
-                                            >
-                                                <RiDragMove2Line className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-
+                                    <div key={section.id} className={section.type === "footer" ? "footer-content" : ""}>
                                         {section.type === "header" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="header"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '24px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <div className="header-content mb-4" style={{ fontSize: '24px' }} dangerouslySetInnerHTML={renderHTML(section.content, section.type)}></div>
                                         )}
 
                                         {section.type === "text" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="text"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '16px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <div className="text-content mb-4" style={{ fontSize: '16px' }} dangerouslySetInnerHTML={renderHTML(section.content, section.type)}></div>
                                         )}
 
                                         {section.type === "button" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Text</label>
-                                                                <Input
-                                                                    value={section.content}
-                                                                    onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                                                                    placeholder="Button text"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Link</label>
-                                                                <Input
-                                                                    value={section.link || ''}
-                                                                    onChange={(e) => updateSection(section.id, { link: e.target.value })}
-                                                                    placeholder="Button link"
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Color</label>
-                                                                <div className="grid grid-cols-2 gap-2">
-                                                                    <Select
-                                                                        value={section.buttonColor || 'primary'}
-                                                                        onValueChange={(value) => updateSection(section.id, { buttonColor: value })}
-                                                                    >
-                                                                        <SelectTrigger className="w-full">
-                                                                            <SelectValue placeholder="Select button color" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectGroup>
-                                                                                <SelectGroupLabel>Button Colors</SelectGroupLabel>
-                                                                                <SelectItem value="primary">Primary</SelectItem>
-                                                                                <SelectItem value="secondary">Secondary</SelectItem>
-                                                                                <SelectItem value="destructive">Destructive</SelectItem>
-                                                                                <SelectItem value="ghost">Outline</SelectItem>
-                                                                                <SelectItem value="custom">Custom</SelectItem>
-                                                                            </SelectGroup>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    {section.buttonColor === 'custom' && (
-                                                                        <Input
-                                                                            type="color"
-                                                                            value={section.buttonColor === 'custom' ? (section.customButtonColor || '#3b82f6') : '#3b82f6'}
-                                                                            onChange={(e) => updateSection(section.id, { customButtonColor: e.target.value })}
-                                                                            className="p-1 h-10"
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Size</label>
-                                                                <Select
-                                                                    value={section.buttonSize || 'default'}
-                                                                    onValueChange={(value) => updateSection(section.id, { buttonSize: value })}
-                                                                >
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder="Select button size" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="default">Default</SelectItem>
-                                                                        <SelectItem value="sm">Small</SelectItem>
-                                                                        <SelectItem value="lg">Large</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Button Alignment</label>
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    variant={section.buttonAlign === 'left' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'left' })}
-                                                                >
-                                                                    <RiAlignLeft className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant={!section.buttonAlign || section.buttonAlign === 'center' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'center' })}
-                                                                >
-                                                                    <RiAlignCenter className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant={section.buttonAlign === 'right' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'right' })}
-                                                                >
-                                                                    <RiAlignRight className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Button Preview</label>
-                                                            <div className={`flex ${section.buttonAlign === 'left' ? 'justify-start' : section.buttonAlign === 'right' ? 'justify-end' : 'justify-center'}`}>
-                                                                <Button
-                                                                    variant={section.buttonColor === 'custom' ? undefined : (section.buttonColor || 'primary')}
-                                                                    className={`${section.buttonSize === 'sm' ? 'text-xs px-2 py-1 h-8' : section.buttonSize === 'lg' ? 'text-lg px-6 py-3 h-12' : ''}`}
-                                                                    style={section.buttonColor === 'custom' ? {
-                                                                        backgroundColor: section.customButtonColor || '#3b82f6',
-                                                                        color: getContrastRatio(section.customButtonColor || '#3b82f6')
-                                                                    } : undefined}
-                                                                >
-                                                                    {section.content}
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className={`flex ${section.buttonAlign === 'left' ? 'justify-start' : section.buttonAlign === 'right' ? 'justify-end' : 'justify-center'}`}>
-                                                        <Button
-                                                            variant={section.buttonColor === 'custom' ? undefined : (section.buttonColor || 'primary')}
-                                                            className={`${section.buttonSize === 'sm' ? 'text-xs px-2 py-1 h-8' : section.buttonSize === 'lg' ? 'text-lg px-6 py-3 h-12' : ''}`}
-                                                            style={section.buttonColor === 'custom' ? {
-                                                                backgroundColor: section.customButtonColor || '#3b82f6',
-                                                                color: getContrastRatio(section.customButtonColor || '#3b82f6')
-                                                            } : undefined}
-                                                        >
-                                                            {section.content}
-                                                        </Button>
-                                                    </div>
-                                                )}
+                                            <div className="button-content mb-4">
+                                                <a
+                                                    href={section.link}
+                                                    className="inline-block px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
+                                                >
+                                                    {section.content}
+                                                </a>
                                             </div>
                                         )}
 
                                         {section.type === "footer" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="footer"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="text-sm text-gray-500 prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '14px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for image section */}
-                                        {section.type === "image" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Image URL</label>
-                                                            <Input
-                                                                value={section.content}
-                                                                onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                                                                placeholder="Enter image URL"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Alt Text</label>
-                                                            <Input
-                                                                value={section.imageAlt || ''}
-                                                                onChange={(e) => updateSection(section.id, { imageAlt: e.target.value })}
-                                                                placeholder="Describe the image"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Height</label>
-                                                            <Select
-                                                                value={section.imageHeight || '200px'}
-                                                                onValueChange={(value) => updateSection(section.id, { imageHeight: value })}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select height" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="100px">Small (100px)</SelectItem>
-                                                                    <SelectItem value="200px">Medium (200px)</SelectItem>
-                                                                    <SelectItem value="300px">Large (300px)</SelectItem>
-                                                                    <SelectItem value="auto">Auto</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Image Preview</label>
-                                                            <div className="border rounded-md overflow-hidden">
-                                                                <img
-                                                                    src={section.content}
-                                                                    alt={section.imageAlt || 'Preview'}
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        height: section.imageHeight || '200px',
-                                                                        objectFit: 'cover'
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex justify-center">
-                                                        <img
-                                                            src={section.content}
-                                                            alt={section.imageAlt || 'Image'}
-                                                            style={{
-                                                                maxWidth: '100%',
-                                                                height: section.imageHeight || '200px',
-                                                                objectFit: 'cover'
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for spacer section */}
-                                        {section.type === "spacer" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Spacer Height</label>
-                                                            <Select
-                                                                value={section.padding}
-                                                                onValueChange={(value) => updateSection(section.id, { padding: value })}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select height" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="0.5rem">Small (8px)</SelectItem>
-                                                                    <SelectItem value="1rem">Medium (16px)</SelectItem>
-                                                                    <SelectItem value="2rem">Large (32px)</SelectItem>
-                                                                    <SelectItem value="3rem">Extra Large (48px)</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <div className="border-t border-dashed border-gray-300 my-2"></div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="border-t border-dashed border-gray-300 my-2"></div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for content link section */}
-                                        {section.type === "content-link" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Select Content</label>
-                                                            <Select
-                                                                value={section.contentId || ''}
-                                                                onValueChange={(value) => {
-                                                                    // Find the selected content
-                                                                    const selectedContent = [
-                                                                        { id: 'c1', title: 'How to Improve Customer Engagement', description: 'Learn effective strategies to boost customer engagement and retention through personalized communication.', image: 'https://placehold.co/600x300/4f46e5/ffffff?text=Customer+Engagement', url: '/blog/customer-engagement' },
-                                                                        { id: 'c2', title: 'Email Marketing Best Practices', description: 'Discover the latest best practices in email marketing to increase open rates and conversions.', image: 'https://placehold.co/600x300/0ea5e9/ffffff?text=Email+Marketing', url: '/blog/email-marketing' },
-                                                                        { id: 'c3', title: 'Product Update: New Features', description: 'Explore the exciting new features we have added to our platform to enhance your experience.', image: 'https://placehold.co/600x300/10b981/ffffff?text=Product+Update', url: '/updates/new-features' }
-                                                                    ].find(c => c.id === value);
-
-                                                                    if (selectedContent) {
-                                                                        updateSection(section.id, {
-                                                                            contentId: value,
-                                                                            content: selectedContent.title,
-                                                                            description: selectedContent.description,
-                                                                            image: selectedContent.image,
-                                                                            link: selectedContent.url
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select content" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="c1">How to Improve Customer Engagement</SelectItem>
-                                                                    <SelectItem value="c2">Email Marketing Best Practices</SelectItem>
-                                                                    <SelectItem value="c3">Product Update: New Features</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
-                                                            <Input
-                                                                value={section.ctaText || 'Read more →'}
-                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Enter call-to-action text"
-                                                            />
-                                                        </div>
-
-                                                        {section.contentId && (
-                                                            <div className="border rounded-md p-4 bg-gray-50">
-                                                                <div className="text-sm font-medium mb-2">Preview</div>
-                                                                <div className="space-y-3">
-                                                                    <img
-                                                                        src={section.image}
-                                                                        alt={section.content}
-                                                                        className="w-full h-40 object-cover rounded-md"
-                                                                    />
-                                                                    <h3 className="font-bold text-lg">{section.content}</h3>
-                                                                    <p className="text-sm text-gray-600">{section.description}</p>
-                                                                    <div className="text-primary text-sm">{section.ctaText || 'Read more →'}</div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="border rounded-md overflow-hidden">
-                                                        {section.image && (
-                                                            <img
-                                                                src={section.image}
-                                                                alt={section.content}
-                                                                className="w-full h-40 object-cover"
-                                                            />
-                                                        )}
-                                                        <div className="p-4">
-                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
-                                                            {section.description && (
-                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
-                                                            )}
-                                                            <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
-                                                                <RiArticleLine className="mr-1" />
-                                                                {section.ctaText || 'Read more →'}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for event link section */}
-                                        {section.type === "event-link" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Select Event</label>
-                                                            <Select
-                                                                value={section.eventId || ''}
-                                                                onValueChange={(value) => {
-                                                                    // Find the selected event
-                                                                    const selectedEvent = [
-                                                                        { id: 'e1', title: 'Annual Customer Conference', description: 'Join us for our annual customer conference featuring industry experts and networking opportunities.', date: 'June 15-17, 2023', location: 'San Francisco, CA', image: 'https://placehold.co/600x300/f97316/ffffff?text=Annual+Conference', url: '/events/annual-conference' },
-                                                                        { id: 'e2', title: 'Product Webinar Series', description: 'Learn how to maximize your productivity with our latest features in this interactive webinar.', date: 'July 8, 2023', location: 'Online', image: 'https://placehold.co/600x300/ec4899/ffffff?text=Webinar+Series', url: '/events/webinar-series' },
-                                                                        { id: 'e3', title: 'Industry Roundtable Discussion', description: 'Participate in our exclusive roundtable discussion with industry leaders on emerging trends.', date: 'August 22, 2023', location: 'New York, NY', image: 'https://placehold.co/600x300/8b5cf6/ffffff?text=Roundtable', url: '/events/roundtable' }
-                                                                    ].find(e => e.id === value);
-
-                                                                    if (selectedEvent) {
-                                                                        updateSection(section.id, {
-                                                                            eventId: value,
-                                                                            content: selectedEvent.title,
-                                                                            description: selectedEvent.description,
-                                                                            image: selectedEvent.image,
-                                                                            link: selectedEvent.url,
-                                                                            date: selectedEvent.date,
-                                                                            location: selectedEvent.location
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select event" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="e1">Annual Customer Conference</SelectItem>
-                                                                    <SelectItem value="e2">Product Webinar Series</SelectItem>
-                                                                    <SelectItem value="e3">Industry Roundtable Discussion</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
-                                                            <Input
-                                                                value={section.ctaText || 'Register now →'}
-                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Enter call-to-action text"
-                                                            />
-                                                        </div>
-
-                                                        {section.eventId && (
-                                                            <div className="border rounded-md p-4 bg-gray-50">
-                                                                <div className="text-sm font-medium mb-2">Preview</div>
-                                                                <div className="space-y-3">
-                                                                    <img
-                                                                        src={section.image}
-                                                                        alt={section.content}
-                                                                        className="w-full h-40 object-cover rounded-md"
-                                                                    />
-                                                                    <h3 className="font-bold text-lg">{section.content}</h3>
-                                                                    <p className="text-sm text-gray-600">{section.description}</p>
-                                                                    <div className="flex items-center text-sm text-gray-600 space-x-4">
-                                                                        <div className="flex items-center">
-                                                                            <RiCalendarEventLine className="mr-1" />
-                                                                            {section.date}
-                                                                        </div>
-                                                                        <div className="flex items-center">
-                                                                            <span className="mr-1">📍</span>
-                                                                            {section.location}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="text-primary text-sm">{section.ctaText || 'Register now →'}</div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="border rounded-md overflow-hidden">
-                                                        {section.image && (
-                                                            <img
-                                                                src={section.image}
-                                                                alt={section.content}
-                                                                className="w-full h-40 object-cover"
-                                                            />
-                                                        )}
-                                                        <div className="p-4">
-                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
-                                                            {section.description && (
-                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
-                                                            )}
-                                                            {section.date && section.location && (
-                                                                <div className="flex items-center text-sm text-gray-600 space-x-4 mb-3">
-                                                                    <div className="flex items-center">
-                                                                        <RiCalendarEventLine className="mr-1" />
-                                                                        {section.date}
-                                                                    </div>
-                                                                    <div className="flex items-center">
-                                                                        <span className="mr-1">📍</span>
-                                                                        {section.location}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                            <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
-                                                                <RiCalendarEventLine className="mr-1" />
-                                                                {section.ctaText || 'Register now →'}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <div className="footer-content mt-8 pt-4 border-t text-gray-500" style={{ fontSize: '14px' }} dangerouslySetInnerHTML={renderHTML(section.content, section.type)}></div>
                                         )}
                                     </div>
                                 ))}
-
-                                {sections.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
-                                        <div className="text-4xl text-gray-400 mb-4">
-                                            <RiMailLine />
-                                        </div>
-                                        <h3 className="text-lg font-medium text-gray-700 mb-2">Your email is empty</h3>
-                                        <p className="text-gray-500 mb-4">Add sections from the sidebar to start building your email</p>
-                                        <div className="flex gap-2">
-                                            <Button onClick={() => addSection("header")}>Add Header</Button>
-                                            <Button variant="ghost" onClick={() => addSection("text")}>Add Text</Button>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    )}
                 </div>
-            </div>
-        </div >
+            ) : (
+                // Edit Mode
+                <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-12 lg:col-span-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Template settings</CardTitle>
+                                <CardDescription>Configure your email template</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Template name</label>
+                                    <Input
+                                        value={templateName}
+                                        onChange={(e) => setTemplateName(e.target.value)}
+                                        placeholder="Enter template name"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Subject line</label>
+                                    <Input
+                                        value={subject}
+                                        onChange={(e) => setSubject(e.target.value)}
+                                        placeholder="Enter email subject"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Recipient group</label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select recipient group" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All users</SelectItem>
+                                            <SelectItem value="tenants">Tenants</SelectItem>
+                                            <SelectItem value="employees">Employees</SelectItem>
+                                            <SelectItem value="visitors">Visitors</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mt-6">
+                            <CardHeader>
+                                <CardTitle>Add elements</CardTitle>
+                                <CardDescription>Add elements to your template</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("header")}>
+                                        <span className="text-xl mb-1">H</span>
+                                        <span className="text-sm">Header</span>
+                                    </Button>
+                                    <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("text")}>
+                                        <span className="text-xl mb-1">T</span>
+                                        <span className="text-sm">Text</span>
+                                    </Button>
+                                    <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("button")}>
+                                        <span className="text-xl mb-1">B</span>
+                                        <span className="text-sm">Button</span>
+                                    </Button>
+                                    <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("footer")}>
+                                        <span className="text-xl mb-1">F</span>
+                                        <span className="text-sm">Footer</span>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <div className="col-span-12 lg:col-span-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Email content</CardTitle>
+                                <CardDescription>Design your email template</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4 min-h-[500px] bg-white p-4 rounded-md border">
+                                    {sections.map((section) => (
+                                        <div key={section.id} className="relative group border rounded-md p-4 hover:border-blue-400">
+                                            <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100">
+                                                <Button variant="ghost" className="h-6 w-6 p-0" onClick={() => removeSection(section.id)}>
+                                                    <RiDeleteBinLine className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" className="h-6 w-6 p-0 cursor-move">
+                                                    <RiDragMove2Line className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+
+                                            {section.type === "header" && (
+                                                <div>
+                                                    <div
+                                                        className="text-xl font-bold mb-2 prose-headings:m-0 prose-p:m-0"
+                                                        style={{ fontSize: '24px' }}
+                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
+                                                    </div>
+                                                    <RichTextEditor
+                                                        value={section.content}
+                                                        onChange={(value) => updateSection(section.id, { content: value })}
+                                                        className="mt-2"
+                                                        sectionType="header"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {section.type === "text" && (
+                                                <div>
+                                                    <div
+                                                        className="mb-2 prose-headings:m-0 prose-p:m-0"
+                                                        style={{ fontSize: '16px' }}
+                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
+                                                    </div>
+                                                    <RichTextEditor
+                                                        value={section.content}
+                                                        onChange={(value) => updateSection(section.id, { content: value })}
+                                                        className="mt-2"
+                                                        sectionType="text"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {section.type === "button" && (
+                                                <div>
+                                                    <Button className="mb-2">{section.content}</Button>
+                                                    <div className="grid grid-cols-2 gap-2 mt-2">
+                                                        <Input
+                                                            value={section.content}
+                                                            onChange={(e) => updateSection(section.id, { content: e.target.value })}
+                                                            placeholder="Button text"
+                                                        />
+                                                        <Input
+                                                            value={section.link || ''}
+                                                            onChange={(e) => updateSection(section.id, { link: e.target.value })}
+                                                            placeholder="Button link"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {section.type === "footer" && (
+                                                <div>
+                                                    <div
+                                                        className="text-sm text-gray-500 mb-2 prose-headings:m-0 prose-p:m-0"
+                                                        style={{ fontSize: '14px' }}
+                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
+                                                    </div>
+                                                    <RichTextEditor
+                                                        value={section.content}
+                                                        onChange={(value) => updateSection(section.id, { content: value })}
+                                                        className="mt-2"
+                                                        sectionType="footer"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 } 
