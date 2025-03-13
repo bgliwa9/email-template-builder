@@ -1,6 +1,7 @@
 "use client"
 
 import { PageTemplate } from "@/components/PageTemplate"
+import { useRouter } from "next/navigation"
 
 // Define tabs for the Communications page
 const tabs = [
@@ -12,10 +13,17 @@ const tabs = [
 ]
 
 export default function Communications() {
+    const router = useRouter()
+
+    const handleCreateMessage = () => {
+        router.push("/experience-manager/communications/template-builder")
+    }
+
     return (
         <PageTemplate
             title="Communications"
             primaryCta="Create Message"
+            onPrimaryClick={handleCreateMessage}
             tabs={tabs}
         />
     )
