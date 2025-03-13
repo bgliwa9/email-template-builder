@@ -2,6 +2,8 @@
 
 A modern, user-friendly email template builder with rich text editing, drag-and-drop sections, and customizable templates.
 
+> **Note:** This project has been updated to fix build issues on Vercel.
+
 ## Features
 
 - **Rich Text Editor**: Format text with various styling options including font family, size, color, and alignment
