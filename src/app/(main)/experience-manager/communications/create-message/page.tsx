@@ -37,12 +37,21 @@ const RadioGroupItem = ({ value, id }: { value: string; id: string }) => (
 export default function CreateMessage() {
   const router = useRouter()
   const [messageType, setMessageType] = useState<"push" | "email" | "both">("push")
+  
+  // Push notification state
   const [pushLink, setPushLink] = useState<"home" | "content" | "event">("home")
   const [contentId, setContentId] = useState("")
   const [eventId, setEventId] = useState("")
-  const [audience, setAudience] = useState("all-users")
-  const [title, setTitle] = useState("")
-  const [body, setBody] = useState("")
+  const [pushAudience, setPushAudience] = useState("all-users")
+  const [pushTitle, setPushTitle] = useState("")
+  const [pushBody, setPushBody] = useState("")
+  
+  // Email state
+  const [emailSubject, setEmailSubject] = useState("")
+  const [emailTemplate, setEmailTemplate] = useState<"blank" | "newsletter" | "announcement" | "event" | "custom">("blank")
+  const [emailAudience, setEmailAudience] = useState("all-users")
+  
+  // Common state
   const [sendTime, setSendTime] = useState<"now" | "scheduled">("now")
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined)
 
@@ -52,16 +61,26 @@ export default function CreateMessage() {
 
   const handleContinue = () => {
     if (messageType === "email" || messageType === "both") {
-      router.push("/experience-manager/communications/template-builder")
+      // Pass email configuration as query parameters
+      const params = new URLSearchParams()
+      params.append("subject", emailSubject)
+      params.append("template", emailTemplate)
+      params.append("audience", emailAudience)
+      params.append("sendTime", sendTime)
+      if (sendTime === "scheduled" && scheduledDate) {
+        params.append("scheduledDate", scheduledDate.toISOString())
+      }
+      
+      router.push(`/experience-manager/communications/template-builder?${params.toString()}`)
     } else {
       // Handle push notification submission
       console.log("Push notification submitted", {
         pushLink,
         contentId: pushLink === "content" ? contentId : undefined,
         eventId: pushLink === "event" ? eventId : undefined,
-        audience,
-        title,
-        body,
+        audience: pushAudience,
+        title: pushTitle,
+        body: pushBody,
         sendTime,
         scheduledDate: sendTime === "scheduled" ? scheduledDate : undefined
       })
@@ -173,12 +192,12 @@ export default function CreateMessage() {
             )}
 
             <div>
-              <Label htmlFor="audience">Audience</Label>
+              <Label htmlFor="push-audience">Audience</Label>
               <Select 
-                value={audience} 
-                onValueChange={setAudience}
+                value={pushAudience} 
+                onValueChange={setPushAudience}
               >
-                <SelectTrigger id="audience">
+                <SelectTrigger id="push-audience">
                   <SelectValue placeholder="Select audience" />
                 </SelectTrigger>
                 <SelectContent>
@@ -191,24 +210,83 @@ export default function CreateMessage() {
             </div>
 
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="push-title">Title</Label>
               <Input 
-                id="title" 
-                value={title} 
-                onChange={(e) => setTitle(e.target.value)} 
+                id="push-title" 
+                value={pushTitle} 
+                onChange={(e) => setPushTitle(e.target.value)} 
                 placeholder="Enter notification title" 
               />
             </div>
 
             <div>
-              <Label htmlFor="body">Body</Label>
+              <Label htmlFor="push-body">Body</Label>
               <Textarea 
-                id="body" 
-                value={body} 
-                onChange={(e) => setBody(e.target.value)} 
+                id="push-body" 
+                value={pushBody} 
+                onChange={(e) => setPushBody(e.target.value)} 
                 placeholder="Enter notification body" 
                 rows={3}
               />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {(messageType === "email" || messageType === "both") && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Email Details</CardTitle>
+            <CardDescription>Configure your email message</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <Label htmlFor="email-subject">Subject Line</Label>
+              <Input 
+                id="email-subject" 
+                value={emailSubject} 
+                onChange={(e) => setEmailSubject(e.target.value)} 
+                placeholder="Enter email subject" 
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email-template">Template</Label>
+              <Select 
+                value={emailTemplate} 
+                onValueChange={(value: string) => setEmailTemplate(value as "blank" | "newsletter" | "announcement" | "event" | "custom")}
+              >
+                <SelectTrigger id="email-template">
+                  <SelectValue placeholder="Select a template" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="blank">Blank Template</SelectItem>
+                  <SelectItem value="newsletter">Newsletter</SelectItem>
+                  <SelectItem value="announcement">Announcement</SelectItem>
+                  <SelectItem value="event">Event Invitation</SelectItem>
+                  <SelectItem value="custom">Custom Template</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">You'll be able to customize the template in the next step</p>
+            </div>
+
+            <div>
+              <Label htmlFor="email-audience">Audience</Label>
+              <Select 
+                value={emailAudience} 
+                onValueChange={setEmailAudience}
+              >
+                <SelectTrigger id="email-audience">
+                  <SelectValue placeholder="Select audience" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all-users">All Users</SelectItem>
+                  <SelectItem value="active-users">Active Users</SelectItem>
+                  <SelectItem value="inactive-users">Inactive Users</SelectItem>
+                  <SelectItem value="premium-users">Premium Users</SelectItem>
+                  <SelectItem value="newsletter-subscribers">Newsletter Subscribers</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

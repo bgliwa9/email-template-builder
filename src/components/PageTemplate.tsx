@@ -13,13 +13,15 @@ interface PageTemplateProps {
     primaryCta?: string
     onPrimaryClick?: () => void
     tabs?: { name: string; href: string }[]
+    children?: React.ReactNode
 }
 
 export function PageTemplate({
     title,
     primaryCta,
     onPrimaryClick,
-    tabs
+    tabs,
+    children
 }: PageTemplateProps) {
     const pathname = usePathname()
 
@@ -45,13 +47,19 @@ export function PageTemplate({
                         ))}
                     </TabNavigation>
 
-                    <div className="pt-4">
-                        <DataTable data={usage} columns={columns} />
-                    </div>
+                    {children ? (
+                        <div className="pt-4">
+                            {children}
+                        </div>
+                    ) : (
+                        <div className="pt-4">
+                            <DataTable data={usage} columns={columns} />
+                        </div>
+                    )}
                 </>
             ) : (
                 <div className="rounded-md border">
-                    <DataTable data={usage} columns={columns} />
+                    {children || <DataTable data={usage} columns={columns} />}
                 </div>
             )}
         </div>
