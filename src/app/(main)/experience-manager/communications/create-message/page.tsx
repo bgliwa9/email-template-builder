@@ -9,7 +9,7 @@ import { Input } from "@/components/Input"
 import { Label } from "@/components/Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
 import { Textarea } from "@/components/Textarea"
-import { RiArrowLeftLine, RiMailLine, RiNotification3Line } from "@remixicon/react"
+import { RiArrowLeftLine, RiArticleLine, RiCalendarEventLine, RiMailLine, RiNewspaperLine, RiNotification3Line } from "@remixicon/react"
 
 // Simple RadioGroup implementation until we create the proper component
 const RadioGroup = ({ value, onValueChange, className, children }: { 
@@ -34,6 +34,34 @@ const RadioGroupItem = ({ value, id }: { value: string; id: string }) => (
   />
 );
 
+// Sample template data
+const templates = [
+  {
+    id: "blank",
+    name: "Blank Template",
+    description: "Start with a clean slate",
+    icon: RiArticleLine,
+  },
+  {
+    id: "newsletter",
+    name: "Newsletter",
+    description: "Weekly newsletter template with sections for featured content",
+    icon: RiNewspaperLine,
+  },
+  {
+    id: "announcement",
+    name: "Announcement",
+    description: "Template for important announcements and updates",
+    icon: RiMailLine,
+  },
+  {
+    id: "event",
+    name: "Event Invitation",
+    description: "Template for event invitations with RSVP options",
+    icon: RiCalendarEventLine,
+  },
+];
+
 export default function CreateMessage() {
   const router = useRouter()
   const [messageType, setMessageType] = useState<"push" | "email" | "both">("push")
@@ -48,7 +76,7 @@ export default function CreateMessage() {
   
   // Email state
   const [emailSubject, setEmailSubject] = useState("")
-  const [emailTemplate, setEmailTemplate] = useState<"blank" | "newsletter" | "announcement" | "event" | "custom">("blank")
+  const [emailTemplate, setEmailTemplate] = useState<string>("blank")
   const [emailAudience, setEmailAudience] = useState("all-users")
   
   // Common state
@@ -86,6 +114,10 @@ export default function CreateMessage() {
       })
       router.push("/experience-manager/communications")
     }
+  }
+
+  const selectTemplate = (templateId: string) => {
+    setEmailTemplate(templateId);
   }
 
   return (
@@ -251,26 +283,6 @@ export default function CreateMessage() {
             </div>
 
             <div>
-              <Label htmlFor="email-template">Template</Label>
-              <Select 
-                value={emailTemplate} 
-                onValueChange={(value: string) => setEmailTemplate(value as "blank" | "newsletter" | "announcement" | "event" | "custom")}
-              >
-                <SelectTrigger id="email-template">
-                  <SelectValue placeholder="Select a template" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="blank">Blank Template</SelectItem>
-                  <SelectItem value="newsletter">Newsletter</SelectItem>
-                  <SelectItem value="announcement">Announcement</SelectItem>
-                  <SelectItem value="event">Event Invitation</SelectItem>
-                  <SelectItem value="custom">Custom Template</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">You'll be able to customize the template in the next step</p>
-            </div>
-
-            <div>
               <Label htmlFor="email-audience">Audience</Label>
               <Select 
                 value={emailAudience} 
@@ -287,6 +299,40 @@ export default function CreateMessage() {
                   <SelectItem value="newsletter-subscribers">Newsletter Subscribers</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label className="block mb-3">Select Template</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {templates.map((template) => (
+                  <div 
+                    key={template.id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      emailTemplate === template.id 
+                        ? 'border-primary bg-primary/5 shadow-sm' 
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                    }`}
+                    onClick={() => selectTemplate(template.id)}
+                  >
+                    <div className="flex items-start mb-2">
+                      <div className="p-2 rounded-md bg-primary/10 mr-3">
+                        <template.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{template.name}</h3>
+                        <p className="text-sm text-gray-500">{template.description}</p>
+                      </div>
+                    </div>
+                    {emailTemplate === template.id && (
+                      <div className="flex justify-end">
+                        <div className="bg-primary text-white text-xs px-2 py-1 rounded-full">
+                          Selected
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
