@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/Button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/Card"
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/Textarea"
 import { RiArrowLeftLine, RiArticleLine, RiCalendarEventLine, RiMailLine, RiNewspaperLine, RiNotification3Line } from "@remixicon/react"
 
-// Simple RadioGroup implementation until we create the proper component
+// Functional RadioGroup implementation
 const RadioGroup = ({ value, onValueChange, className, children }: { 
   value: string; 
   onValueChange: (value: string) => void; 
@@ -23,16 +23,44 @@ const RadioGroup = ({ value, onValueChange, className, children }: {
   </div>
 );
 
-const RadioGroupItem = ({ value, id }: { value: string; id: string }) => (
-  <input 
-    type="radio" 
-    id={id} 
-    value={value} 
-    checked={false} 
-    onChange={() => {}} 
-    className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
-  />
-);
+// Functional RadioGroupItem implementation
+const RadioGroupItem = ({ value, id }: { value: string; id: string }) => {
+  // Get the current message type from the parent component
+  const currentValue = document.querySelector(`input[id="${id}"]`)?.getAttribute('data-current-value');
+  const isChecked = currentValue === value;
+  
+  const handleChange = () => {
+    // Find all radio buttons with the same name
+    const radioButtons = document.querySelectorAll(`input[name="${id.split('-')[0]}"]`);
+    
+    // Get the onValueChange function from the parent
+    const onValueChangeStr = document.querySelector(`div[data-radio-group="${id.split('-')[0]}"]`)?.getAttribute('data-on-value-change');
+    if (onValueChangeStr) {
+      // Call the function with the new value
+      const event = new CustomEvent(onValueChangeStr, { detail: value });
+      document.dispatchEvent(event);
+    }
+  };
+  
+  return (
+    <input 
+      type="radio" 
+      id={id} 
+      name={id.split('-')[0]}
+      value={value} 
+      checked={isChecked}
+      onChange={handleChange}
+      onClick={() => {
+        // Directly update the state in the parent component
+        const event = new CustomEvent('radioChange', { 
+          detail: { id: id.split('-')[0], value } 
+        });
+        document.dispatchEvent(event);
+      }}
+      className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer"
+    />
+  );
+};
 
 // Sample template data
 const templates = [
@@ -82,6 +110,26 @@ export default function CreateMessage() {
   // Common state
   const [sendTime, setSendTime] = useState<"now" | "scheduled">("now")
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined)
+
+  // Set up event listeners for radio buttons
+  useEffect(() => {
+    const handleRadioChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { id, value } = customEvent.detail;
+      
+      if (id === 'messageType') {
+        setMessageType(value as "push" | "email" | "both");
+      } else if (id === 'sendTime') {
+        setSendTime(value as "now" | "scheduled");
+      }
+    };
+    
+    document.addEventListener('radioChange', handleRadioChange as EventListener);
+    
+    return () => {
+      document.removeEventListener('radioChange', handleRadioChange as EventListener);
+    };
+  }, []);
 
   const handleBack = () => {
     router.back()
@@ -135,15 +183,19 @@ export default function CreateMessage() {
           <CardDescription>Select the type of message you want to send</CardDescription>
         </CardHeader>
         <CardContent>
-          <RadioGroup 
-            value={messageType} 
-            onValueChange={(value: string) => setMessageType(value as "push" | "email" | "both")}
-            className="flex flex-col space-y-4"
-          >
+          <div className="flex flex-col space-y-4">
             <div className="flex items-start space-x-3">
-              <RadioGroupItem value="push" id="push" />
+              <input 
+                type="radio" 
+                id="messageType-push" 
+                name="messageType"
+                value="push" 
+                checked={messageType === "push"}
+                onChange={() => setMessageType("push")}
+                className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer mt-1"
+              />
               <div className="flex flex-col">
-                <Label htmlFor="push" className="font-medium flex items-center">
+                <Label htmlFor="messageType-push" className="font-medium flex items-center cursor-pointer">
                   <RiNotification3Line className="mr-2 h-5 w-5" />
                   Push Notification
                 </Label>
@@ -151,9 +203,17 @@ export default function CreateMessage() {
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <RadioGroupItem value="email" id="email" />
+              <input 
+                type="radio" 
+                id="messageType-email" 
+                name="messageType"
+                value="email" 
+                checked={messageType === "email"}
+                onChange={() => setMessageType("email")}
+                className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer mt-1"
+              />
               <div className="flex flex-col">
-                <Label htmlFor="email" className="font-medium flex items-center">
+                <Label htmlFor="messageType-email" className="font-medium flex items-center cursor-pointer">
                   <RiMailLine className="mr-2 h-5 w-5" />
                   Email
                 </Label>
@@ -161,9 +221,17 @@ export default function CreateMessage() {
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <RadioGroupItem value="both" id="both" />
+              <input 
+                type="radio" 
+                id="messageType-both" 
+                name="messageType"
+                value="both" 
+                checked={messageType === "both"}
+                onChange={() => setMessageType("both")}
+                className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer mt-1"
+              />
               <div className="flex flex-col">
-                <Label htmlFor="both" className="font-medium flex items-center">
+                <Label htmlFor="messageType-both" className="font-medium flex items-center cursor-pointer">
                   <RiNotification3Line className="mr-2 h-5 w-5" />
                   <RiMailLine className="mr-2 h-5 w-5" />
                   Both
@@ -171,7 +239,7 @@ export default function CreateMessage() {
                 <p className="text-sm text-gray-500">Send both a push notification and an email</p>
               </div>
             </div>
-          </RadioGroup>
+          </div>
         </CardContent>
       </Card>
 
@@ -344,20 +412,32 @@ export default function CreateMessage() {
           <CardDescription>Choose when to send your message</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <RadioGroup 
-            value={sendTime} 
-            onValueChange={(value: string) => setSendTime(value as "now" | "scheduled")}
-            className="flex flex-col space-y-4"
-          >
+          <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-3">
-              <RadioGroupItem value="now" id="send-now" />
-              <Label htmlFor="send-now" className="font-medium">Send immediately</Label>
+              <input 
+                type="radio" 
+                id="sendTime-now" 
+                name="sendTime"
+                value="now" 
+                checked={sendTime === "now"}
+                onChange={() => setSendTime("now")}
+                className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer"
+              />
+              <Label htmlFor="sendTime-now" className="font-medium cursor-pointer">Send immediately</Label>
             </div>
             <div className="flex items-center space-x-3">
-              <RadioGroupItem value="scheduled" id="send-scheduled" />
-              <Label htmlFor="send-scheduled" className="font-medium">Schedule for later</Label>
+              <input 
+                type="radio" 
+                id="sendTime-scheduled" 
+                name="sendTime"
+                value="scheduled" 
+                checked={sendTime === "scheduled"}
+                onChange={() => setSendTime("scheduled")}
+                className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary cursor-pointer"
+              />
+              <Label htmlFor="sendTime-scheduled" className="font-medium cursor-pointer">Schedule for later</Label>
             </div>
-          </RadioGroup>
+          </div>
 
           {sendTime === "scheduled" && (
             <div className="pt-4">
