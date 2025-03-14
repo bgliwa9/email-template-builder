@@ -16,7 +16,7 @@ export default function Communications() {
     const router = useRouter()
 
     const handleCreateMessage = () => {
-        router.push("/experience-manager/communications/template-builder")
+        router.push("/experience-manager/communications/create-message")
     }
 
     return (
