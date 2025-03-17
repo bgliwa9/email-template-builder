@@ -20,7 +20,7 @@ const tabs = [
 // Sample template data
 const templateData = [
     {
-        id: "template1",
+        id: "welcome",
         name: "Welcome Email",
         description: "A warm welcome email for new users",
         lastModified: "2 days ago",
@@ -30,22 +30,22 @@ const templateData = [
         author: "John Smith"
     },
     {
-        id: "template2",
-        name: "Monthly Newsletter",
-        description: "Regular updates and news for your subscribers",
+        id: "announcement",
+        name: "Announcement",
+        description: "Announce important news or updates",
         lastModified: "1 week ago",
         category: "Newsletter",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Monthly+Newsletter",
+        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Announcement",
         createdAt: "2023-11-01",
         author: "Sarah Johnson"
     },
     {
-        id: "template3",
-        name: "Event Invitation",
-        description: "Invite users to your upcoming events",
+        id: "newsletter",
+        name: "Monthly Newsletter",
+        description: "Regular updates and news for your subscribers",
         lastModified: "3 days ago",
-        category: "Events",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Event+Invitation",
+        category: "Newsletter",
+        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Monthly+Newsletter",
         createdAt: "2024-01-10",
         author: "Michael Brown"
     },

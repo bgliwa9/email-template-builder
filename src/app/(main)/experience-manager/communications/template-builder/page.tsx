@@ -1975,7 +1975,9 @@ export default function EmailTemplateBuilder() {
     }, [templateIdParam, skipSelectionParam])
 
     const selectTemplate = (templateId: string) => {
+        // First try to find the template in prebuiltTemplates
         const template = prebuiltTemplates.find(t => t.id === templateId);
+        
         if (template) {
             setSelectedTemplate(templateId);
             setSections(template.sections.map(section => ({
@@ -1985,6 +1987,44 @@ export default function EmailTemplateBuilder() {
                 padding: section.padding || '1rem',
                 margin: section.margin || '0'
             })));
+            setSubject(template.subject || '');
+        } else {
+            // If template not found in prebuiltTemplates, create a default template
+            // This handles templates from the templates page that don't exist in prebuiltTemplates
+            console.log(`Template ${templateId} not found in prebuiltTemplates, creating default template`);
+            setSelectedTemplate(templateId);
+            
+            // Create default sections for the template
+            setSections([
+                { 
+                    id: 101, 
+                    type: "header", 
+                    content: "<h1 style='color: #4a86e8; font-weight: bold;'>Email Template</h1>", 
+                    backgroundColor: 'transparent', 
+                    textAlign: 'left' as const, 
+                    padding: '1rem', 
+                    margin: '0' 
+                },
+                { 
+                    id: 102, 
+                    type: "text", 
+                    content: "This is a sample email template. Edit this content to create your message.", 
+                    backgroundColor: 'transparent', 
+                    textAlign: 'left' as const, 
+                    padding: '1rem', 
+                    margin: '0' 
+                },
+                { 
+                    id: 103, 
+                    type: "footer", 
+                    content: "© 2025 Your Company. All rights reserved.", 
+                    backgroundColor: 'transparent', 
+                    textAlign: 'left' as const, 
+                    padding: '1rem', 
+                    margin: '0' 
+                }
+            ]);
+            setSubject('New Email Template');
         }
     }
 
@@ -2042,10 +2082,13 @@ export default function EmailTemplateBuilder() {
     }
 
     const handleBack = () => {
-        if (step === 'edit') {
+        if (skipSelectionParam) {
+            // If we skipped selection, go back to templates page
+            router.push("/experience-manager/communications/templates");
+        } else if (step === 'edit') {
             setStep('select');
         } else {
-            router.push("/experience-manager/communications");
+            router.push("/experience-manager/communications/templates");
         }
     }
 
