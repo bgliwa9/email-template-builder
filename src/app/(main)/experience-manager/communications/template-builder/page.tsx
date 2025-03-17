@@ -9,7 +9,14 @@ import { Button } from "@/components/Button"
 import { Card } from "@/components/Card"
 import { Input } from "@/components/Input"
 import { Select, SelectContent, SelectGroup, SelectGroupLabel, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
-import { RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, RiArrowLeftLine, RiArticleLine, RiBold, RiCalendarEventLine, RiCheckLine, RiDeleteBinLine, RiDragMove2Line, RiImage2Line, RiItalic, RiLink, RiListOrdered, RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, RiSendPlaneLine, RiUnderline } from "@remixicon/react"
+import { 
+    RiAddLine, RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, 
+    RiArrowLeftLine, RiArticleLine, RiAttachmentLine, RiBold, RiCalendarEventLine, 
+    RiCheckLine, RiDeleteBin6Line, RiDeleteBinLine, RiDownloadLine, RiDragMove2Line, 
+    RiEdit2Line, RiFileLine, RiImage2Line, RiItalic, RiLink, RiListOrdered, 
+    RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, 
+    RiSendPlaneLine, RiSettings4Line, RiUnderline
+} from "@remixicon/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 
@@ -1921,6 +1928,10 @@ type Section = {
     date?: string
     location?: string
     ctaText?: string
+    // Attachment properties
+    fileName?: string
+    fileType?: string
+    fileSize?: string
 }
 
 // Add this function before the EmailTemplateBuilder component
@@ -2045,7 +2056,8 @@ export default function EmailTemplateBuilder() {
                             type === "spacer" ? "" :
                                 type === "content-link" ? "Link to content" :
                                     type === "event-link" ? "Link to event" :
-                                        "<p>Footer content</p>",
+                                        type === "attachment" ? "Document.pdf" :
+                                            "<p>Footer content</p>",
             link: type === "button" || type === "content-link" || type === "event-link" ? "#" : undefined,
             backgroundColor: 'transparent',
             textAlign: 'left' as 'left' | 'center' | 'right',
@@ -2056,7 +2068,10 @@ export default function EmailTemplateBuilder() {
             buttonAlign: type === "button" ? 'center' as 'center' : undefined,
             imageHeight: type === "image" ? '200px' : undefined,
             imageAlt: type === "image" ? 'Image description' : undefined,
-            linkIcon: type === "content-link" ? 'article' : type === "event-link" ? 'calendar' : undefined
+            linkIcon: type === "content-link" ? 'article' : type === "event-link" ? 'calendar' : undefined,
+            fileSize: type === "attachment" ? '125 KB' : undefined,
+            fileType: type === "attachment" ? 'PDF' : undefined,
+            fileName: type === "attachment" ? 'Document.pdf' : undefined
         }
         setSections([...sections, newSection])
     }
@@ -2303,6 +2318,10 @@ export default function EmailTemplateBuilder() {
                                 <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("spacer")}>
                                     <span className="text-xl mb-1">—</span>
                                     <span className="text-sm">Spacer</span>
+                                </Button>
+                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("attachment")}>
+                                    <RiAttachmentLine className="text-xl mb-1" />
+                                    <span className="text-sm">Attachment</span>
                                 </Button>
                                 <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("content-link")}>
                                     <RiArticleLine className="text-xl mb-1" />
@@ -3023,6 +3042,60 @@ export default function EmailTemplateBuilder() {
                                                         </div>
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+
+                                        {/* Attachment section editor */}
+                                        {editingSection === section.id && section.type === "attachment" && (
+                                            <div className="mt-4 p-4 border rounded-md bg-gray-50">
+                                                <h4 className="font-medium mb-3">Edit Attachment</h4>
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">File Name</label>
+                                                        <Input
+                                                            value={section.fileName || section.content}
+                                                            onChange={(e) => updateSection(section.id, { fileName: e.target.value, content: e.target.value })}
+                                                            placeholder="Enter file name"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">File Type</label>
+                                                        <Select
+                                                            value={section.fileType || 'PDF'}
+                                                            onValueChange={(value) => updateSection(section.id, { fileType: value })}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select file type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="PDF">PDF</SelectItem>
+                                                                <SelectItem value="DOCX">Word Document</SelectItem>
+                                                                <SelectItem value="XLSX">Excel Spreadsheet</SelectItem>
+                                                                <SelectItem value="PPTX">PowerPoint</SelectItem>
+                                                                <SelectItem value="ZIP">ZIP Archive</SelectItem>
+                                                                <SelectItem value="TXT">Text File</SelectItem>
+                                                                <SelectItem value="IMG">Image</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">File Size</label>
+                                                        <Input
+                                                            value={section.fileSize || '125 KB'}
+                                                            onChange={(e) => updateSection(section.id, { fileSize: e.target.value })}
+                                                            placeholder="Enter file size"
+                                                        />
+                                                    </div>
+                                                    <div className="pt-2">
+                                                        <Button variant="outline" className="w-full">
+                                                            <RiAttachmentLine className="mr-2" />
+                                                            Upload File
+                                                        </Button>
+                                                        <p className="text-xs text-gray-500 mt-1">
+                                                            In a real implementation, this would allow you to upload an actual file.
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
