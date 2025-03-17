@@ -1937,6 +1937,9 @@ type Section = {
     resourceType?: string
     capacity?: string
     price?: string
+    // Section sizing
+    sectionWidth?: string
+    customWidth?: string
 }
 
 // Add this function before the EmailTemplateBuilder component
@@ -2084,7 +2087,8 @@ export default function EmailTemplateBuilder() {
             price: type === "resource-link" ? '$50/hour' : undefined,
             ctaText: type === "resource-link" ? 'Book now →' : undefined,
             description: type === "resource-link" ? 'Large conference room with projector and whiteboard' : undefined,
-            image: type === "resource-link" ? 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80' : undefined
+            image: type === "resource-link" ? 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80' : undefined,
+            sectionWidth: '100%'
         }
         setSections([...sections, newSection])
     }
@@ -2386,7 +2390,7 @@ export default function EmailTemplateBuilder() {
                                         <div className="text-sm text-gray-700 dark:text-gray-300 ml-2">
                                             {sections.find(s => s.id === editingSection)?.backgroundColor === 'transparent'
                                                 ? 'Transparent'
-                                                : sections.find(s => s.id === editingSection)?.backgroundColor?.toUpperCase()}
+                                                : sections.find(s => s.id === editingSection)?.backgroundColor || '#ffffff'}
                                         </div>
                                     </div>
                                 </div>
@@ -2444,6 +2448,70 @@ export default function EmailTemplateBuilder() {
                                     </Select>
                                 </div>
 
+                                {/* Section height control */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Section Height</label>
+                                    <Select
+                                        value={sections.find(s => s.id === editingSection)?.sectionHeight || 'auto'}
+                                        onValueChange={(value) => updateSection(editingSection, { sectionHeight: value })}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select height" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="auto">Auto</SelectItem>
+                                            <SelectItem value="100px">Small (100px)</SelectItem>
+                                            <SelectItem value="200px">Medium (200px)</SelectItem>
+                                            <SelectItem value="300px">Large (300px)</SelectItem>
+                                            <SelectItem value="400px">Extra Large (400px)</SelectItem>
+                                            <SelectItem value="custom">Custom...</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {sections.find(s => s.id === editingSection)?.sectionHeight === 'custom' && (
+                                        <div className="mt-2">
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter custom height (e.g., 250px, 50vh, etc.)"
+                                                value={sections.find(s => s.id === editingSection)?.customHeight || ''}
+                                                onChange={(e) => updateSection(editingSection, { customHeight: e.target.value })}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Section width control */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Section Width</label>
+                                    <Select
+                                        value={sections.find(s => s.id === editingSection)?.sectionWidth || '100%'}
+                                        onValueChange={(value) => updateSection(editingSection, { sectionWidth: value })}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select width" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="100%">Full Width</SelectItem>
+                                            <SelectItem value="75%">Three Quarters</SelectItem>
+                                            <SelectItem value="50%">Half Width</SelectItem>
+                                            <SelectItem value="33%">One Third</SelectItem>
+                                            <SelectItem value="25%">One Quarter</SelectItem>
+                                            <SelectItem value="custom">Custom...</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {sections.find(s => s.id === editingSection)?.sectionWidth === 'custom' && (
+                                        <div className="mt-2">
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter custom width (e.g., 80%, 300px, etc.)"
+                                                value={sections.find(s => s.id === editingSection)?.customWidth || ''}
+                                                onChange={(e) => updateSection(editingSection, { customWidth: e.target.value })}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
                                 {/* Margin control */}
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Margin</label>
@@ -2464,791 +2532,237 @@ export default function EmailTemplateBuilder() {
                                     </Select>
                                 </div>
 
-                                {/* Delete section button */}
-                                <div className="pt-4 border-t">
-                                    <Button
-                                        variant="destructive"
-                                        className="w-full"
-                                        onClick={() => {
-                                            removeSection(editingSection);
-                                            setEditingSection(null);
-                                            setIsEditingStyle(false);
-                                        }}
+                                {/* Padding control */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Padding</label>
+                                    <Select
+                                        value={sections.find(s => s.id === editingSection)?.padding || '1rem'}
+                                        onValueChange={(value) => updateSection(editingSection, { padding: value })}
                                     >
-                                        <RiDeleteBinLine className="mr-2" />
-                                        Delete section
-                                    </Button>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select padding" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="0">None</SelectItem>
+                                            <SelectItem value="0.5rem">Small</SelectItem>
+                                            <SelectItem value="1rem">Medium</SelectItem>
+                                            <SelectItem value="1.5rem">Large</SelectItem>
+                                            <SelectItem value="2rem">Extra Large</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    )}
 
-                    {/* Email subject line */}
-                    <Card className="mt-6">
-                        <CardHeader>
-                            <CardTitle>Email subject</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Input
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                placeholder="Enter email subject"
-                            />
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* WYSIWYG Email Content Area */}
-                <div className="col-span-12 lg:col-span-9">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle>Email content</CardTitle>
-                                <CardDescription>Edit your email directly</CardDescription>
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                Click on a section to edit its content. Use the style button to change appearance.
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="space-y-4 min-h-[600px] bg-white p-4 rounded-md border"
-                                onClick={(e) => {
-                                    // Only close sections if clicking directly on the container
-                                    if (e.target === e.currentTarget) {
-                                        setEditingSection(null);
-                                        setIsEditingStyle(false);
-                                    }
-                                }}
-                            >
-                                {sections.map((section) => (
-                                    <div
-                                        key={section.id}
-                                        className={`relative group hover:border hover:border-blue-400 transition-all ${editingSection === section.id ? 'ring-2 ring-blue-500' : 'border-transparent border'}`}
-                                        style={{
-                                            backgroundColor: section.backgroundColor !== 'transparent' ? section.backgroundColor : 'transparent',
-                                            padding: section.padding,
-                                            margin: section.margin,
-                                            textAlign: section.textAlign,
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingSection(section.id);
-                                        }}
-                                        draggable
-                                        onDragStart={() => handleDragStart(section.id)}
-                                        onDragOver={(e) => handleDragOver(e, section.id)}
-                                        onDragEnd={handleDragEnd}
-                                    >
-                                        {/* Section toolbar */}
-                                        <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 bg-white shadow-sm rounded-md border p-1 z-10">
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setEditingSection(section.id);
-                                                    setIsEditingStyle(!isEditingStyle);
-                                                }}
-                                                title="Edit style"
-                                            >
-                                                <RiPaintFill className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    removeSection(section.id);
-                                                    setEditingSection(null);
-                                                }}
-                                                title="Delete section"
-                                            >
-                                                <RiDeleteBinLine className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="h-6 w-6 p-0 cursor-grab"
-                                                title="Drag to reorder"
-                                            >
-                                                <RiDragMove2Line className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-
-                                        {section.type === "header" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="header"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '24px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {section.type === "text" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="text"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '16px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {section.type === "button" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Text</label>
-                                                                <Input
-                                                                    value={section.content}
-                                                                    onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                                                                    placeholder="Button text"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Link</label>
-                                                                <Input
-                                                                    value={section.link || ''}
-                                                                    onChange={(e) => updateSection(section.id, { link: e.target.value })}
-                                                                    placeholder="Button link"
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Color</label>
-                                                                <div className="grid grid-cols-2 gap-2">
-                                                                    <Select
-                                                                        value={section.buttonColor || 'primary'}
-                                                                        onValueChange={(value) => updateSection(section.id, { buttonColor: value })}
-                                                                    >
-                                                                        <SelectTrigger className="w-full">
-                                                                            <SelectValue placeholder="Select button color" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectGroup>
-                                                                                <SelectGroupLabel>Button Colors</SelectGroupLabel>
-                                                                                <SelectItem value="primary">Primary</SelectItem>
-                                                                                <SelectItem value="secondary">Secondary</SelectItem>
-                                                                                <SelectItem value="destructive">Destructive</SelectItem>
-                                                                                <SelectItem value="ghost">Outline</SelectItem>
-                                                                                <SelectItem value="custom">Custom</SelectItem>
-                                                                            </SelectGroup>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    {section.buttonColor === 'custom' && (
-                                                                        <Input
-                                                                            type="color"
-                                                                            value={section.buttonColor === 'custom' ? (section.customButtonColor || '#3b82f6') : '#3b82f6'}
-                                                                            onChange={(e) => updateSection(section.id, { customButtonColor: e.target.value })}
-                                                                            className="p-1 h-10"
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-1">Button Size</label>
-                                                                <Select
-                                                                    value={section.buttonSize || 'default'}
-                                                                    onValueChange={(value) => updateSection(section.id, { buttonSize: value })}
-                                                                >
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder="Select button size" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="default">Default</SelectItem>
-                                                                        <SelectItem value="sm">Small</SelectItem>
-                                                                        <SelectItem value="lg">Large</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Button Alignment</label>
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    variant={section.buttonAlign === 'left' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'left' })}
-                                                                >
-                                                                    <RiAlignLeft className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant={!section.buttonAlign || section.buttonAlign === 'center' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'center' })}
-                                                                >
-                                                                    <RiAlignCenter className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant={section.buttonAlign === 'right' ? 'primary' : 'ghost'}
-                                                                    className="flex-1 h-10"
-                                                                    onClick={() => updateSection(section.id, { buttonAlign: 'right' })}
-                                                                >
-                                                                    <RiAlignRight className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Button Preview</label>
-                                                            <div className={`flex ${section.buttonAlign === 'left' ? 'justify-start' : section.buttonAlign === 'right' ? 'justify-end' : 'justify-center'}`}>
-                                                                <Button
-                                                                    variant={section.buttonColor === 'custom' ? undefined : (section.buttonColor || 'primary')}
-                                                                    className={`${section.buttonSize === 'sm' ? 'text-xs px-2 py-1 h-8' : section.buttonSize === 'lg' ? 'text-lg px-6 py-3 h-12' : ''}`}
-                                                                    style={section.buttonColor === 'custom' ? {
-                                                                        backgroundColor: section.customButtonColor || '#3b82f6',
-                                                                        color: getContrastRatio(section.customButtonColor || '#3b82f6')
-                                                                    } : undefined}
-                                                                >
-                                                                    {section.content}
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className={`flex ${section.buttonAlign === 'left' ? 'justify-start' : section.buttonAlign === 'right' ? 'justify-end' : 'justify-center'}`}>
-                                                        <Button
-                                                            variant={section.buttonColor === 'custom' ? undefined : (section.buttonColor || 'primary')}
-                                                            className={`${section.buttonSize === 'sm' ? 'text-xs px-2 py-1 h-8' : section.buttonSize === 'lg' ? 'text-lg px-6 py-3 h-12' : ''}`}
-                                                            style={section.buttonColor === 'custom' ? {
-                                                                backgroundColor: section.customButtonColor || '#3b82f6',
-                                                                color: getContrastRatio(section.customButtonColor || '#3b82f6')
-                                                            } : undefined}
-                                                        >
-                                                            {section.content}
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {section.type === "footer" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <RichTextEditor
-                                                        value={section.content}
-                                                        onChange={(value) => updateSection(section.id, { content: value })}
-                                                        sectionType="footer"
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="text-sm text-gray-500 prose-headings:m-0 prose-p:m-0"
-                                                        style={{ fontSize: '14px' }}
-                                                        dangerouslySetInnerHTML={renderHTML(section.content, section.type)}>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for image section */}
-                                        {section.type === "image" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Image URL</label>
-                                                            <Input
-                                                                value={section.content}
-                                                                onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                                                                placeholder="Enter image URL"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Alt Text</label>
-                                                            <Input
-                                                                value={section.imageAlt || ''}
-                                                                onChange={(e) => updateSection(section.id, { imageAlt: e.target.value })}
-                                                                placeholder="Describe the image"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Height</label>
-                                                            <Select
-                                                                value={section.imageHeight || '200px'}
-                                                                onValueChange={(value) => updateSection(section.id, { imageHeight: value })}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select height" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="100px">Small (100px)</SelectItem>
-                                                                    <SelectItem value="200px">Medium (200px)</SelectItem>
-                                                                    <SelectItem value="300px">Large (300px)</SelectItem>
-                                                                    <SelectItem value="auto">Auto</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Image Preview</label>
-                                                            <div className="border rounded-md overflow-hidden">
-                                                                <img
-                                                                    src={section.content}
-                                                                    alt={section.imageAlt || 'Preview'}
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        height: section.imageHeight || '200px',
-                                                                        objectFit: 'cover'
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex justify-center">
-                                                        <img
-                                                            src={section.content}
-                                                            alt={section.imageAlt || 'Image'}
-                                                            style={{
-                                                                maxWidth: '100%',
-                                                                height: section.imageHeight || '200px',
-                                                                objectFit: 'cover'
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for spacer section */}
-                                        {section.type === "spacer" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Spacer Height</label>
-                                                            <Select
-                                                                value={section.padding}
-                                                                onValueChange={(value) => updateSection(section.id, { padding: value })}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select height" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="0.5rem">Small (8px)</SelectItem>
-                                                                    <SelectItem value="1rem">Medium (16px)</SelectItem>
-                                                                    <SelectItem value="2rem">Large (32px)</SelectItem>
-                                                                    <SelectItem value="3rem">Extra Large (48px)</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <div className="border-t border-dashed border-gray-300 my-2"></div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="border-t border-dashed border-gray-300 my-2"></div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for content link section */}
-                                        {section.type === "content-link" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Select Content</label>
-                                                            <Select
-                                                                value={section.contentId || ''}
-                                                                onValueChange={(value) => {
-                                                                    // Find the selected content
-                                                                    const selectedContent = [
-                                                                        { id: 'c1', title: 'Getting Started Guide', description: 'A comprehensive guide to help you get started with our platform.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/getting-started' },
-                                                                        { id: 'c2', title: 'Product Updates', description: 'Learn about the latest features and improvements to our platform.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/product-updates' },
-                                                                        { id: 'c3', title: 'Best Practices', description: 'Tips and tricks to get the most out of our platform.', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/best-practices' }
-                                                                    ].find(c => c.id === value);
-
-                                                                    if (selectedContent) {
-                                                                        updateSection(section.id, {
-                                                                            contentId: value,
-                                                                            content: selectedContent.title,
-                                                                            description: selectedContent.description,
-                                                                            image: selectedContent.image,
-                                                                            link: selectedContent.url
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select content" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="c1">Getting Started Guide</SelectItem>
-                                                                    <SelectItem value="c2">Product Updates</SelectItem>
-                                                                    <SelectItem value="c3">Best Practices</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
-                                                            <Input
-                                                                value={section.ctaText || 'Read more →'}
-                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Enter call-to-action text"
-                                                            />
-                                                        </div>
-
-                                                        {section.contentId && (
-                                                            <div className="border rounded-md p-4 bg-gray-50">
-                                                                <div className="text-sm font-medium mb-2">Preview</div>
-                                                                <div className="space-y-3">
-                                                                    <img
-                                                                        src={section.image}
-                                                                        alt={section.content}
-                                                                        className="w-full h-40 object-cover rounded-md"
-                                                                    />
-                                                                    <h3 className="font-bold text-lg">{section.content}</h3>
-                                                                    <p className="text-sm text-gray-600">{section.description}</p>
-                                                                    <div className="text-primary text-sm">{section.ctaText || 'Read more →'}</div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="border rounded-md overflow-hidden">
-                                                        {section.image && (
-                                                            <img
-                                                                src={section.image}
-                                                                alt={section.content}
-                                                                className="w-full h-40 object-cover"
-                                                            />
-                                                        )}
-                                                        <div className="p-4">
-                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
-                                                            {section.description && (
-                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
-                                                            )}
-                                                            <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
-                                                                <RiArticleLine className="mr-1" />
-                                                                {section.ctaText || 'Read more →'}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for event link section */}
-                                        {section.type === "event-link" && (
-                                            <div>
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Select Event</label>
-                                                            <Select
-                                                                value={section.eventId || ''}
-                                                                onValueChange={(value) => {
-                                                                    // Find the selected event
-                                                                    const selectedEvent = [
-                                                                        { id: 'e1', title: 'Annual Customer Conference', description: 'Join us for our annual customer conference featuring industry experts and networking opportunities.', date: 'June 15-17, 2023', location: 'San Francisco, CA', image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/annual-conference' },
-                                                                        { id: 'e2', title: 'Product Webinar Series', description: 'Learn how to maximize your productivity with our latest features in this interactive webinar.', date: 'July 8, 2023', location: 'Online', image: 'https://images.unsplash.com/photo-1591115765373-5207764f72e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/webinar-series' },
-                                                                        { id: 'e3', title: 'Industry Roundtable Discussion', description: 'Participate in our exclusive roundtable discussion with industry leaders on emerging trends.', date: 'August 22, 2023', location: 'New York, NY', image: 'https://images.unsplash.com/photo-1582192730841-2a682d7375f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/roundtable' }
-                                                                    ].find(e => e.id === value);
-
-                                                                    if (selectedEvent) {
-                                                                        updateSection(section.id, {
-                                                                            eventId: value,
-                                                                            content: selectedEvent.title,
-                                                                            description: selectedEvent.description,
-                                                                            image: selectedEvent.image,
-                                                                            link: selectedEvent.url,
-                                                                            date: selectedEvent.date,
-                                                                            location: selectedEvent.location
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select an event" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="e1">Annual Customer Conference</SelectItem>
-                                                                    <SelectItem value="e2">Product Webinar Series</SelectItem>
-                                                                    <SelectItem value="e3">Industry Roundtable Discussion</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
-                                                            <Input
-                                                                value={section.ctaText || 'Register now →'}
-                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Call to action text"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="border rounded-md overflow-hidden">
-                                                        {section.image && (
-                                                            <img
-                                                                src={section.image}
-                                                                alt={section.content}
-                                                                className="w-full h-40 object-cover"
-                                                            />
-                                                        )}
-                                                        <div className="p-4">
-                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
-                                                            {section.description && (
-                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
-                                                            )}
-                                                            {section.date && section.location && (
-                                                                <div className="flex items-center text-sm text-gray-600 space-x-4 mb-3">
-                                                                    <div className="flex items-center">
-                                                                        <RiCalendarEventLine className="mr-1" />
-                                                                        {section.date}
-                                                                    </div>
-                                                                    <div className="flex items-center">
-                                                                        <span className="mr-1">📍</span>
-                                                                        {section.location}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                            <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
-                                                                <RiCalendarEventLine className="mr-1" />
-                                                                {section.ctaText || 'Register now →'}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for attachment section */}
-                                        {section.type === "attachment" && (
-                                            <div 
-                                                onClick={() => {
-                                                    if (editingSection !== section.id) {
-                                                        setEditingSection(section.id);
-                                                        setIsEditingStyle(false);
-                                                    }
-                                                }}
-                                                className="cursor-pointer"
-                                            >
-                                                <div
-                                                    style={{
-                                                        backgroundColor: section.backgroundColor === 'transparent' ? 'transparent' : section.backgroundColor,
-                                                        padding: section.padding,
-                                                        margin: section.margin,
-                                                        textAlign: section.textAlign
-                                                    }}
-                                                    className="border border-gray-200 rounded-md p-4"
-                                                >
-                                                    <div className="flex items-center">
-                                                        <div className="bg-gray-100 p-3 rounded-md mr-3">
-                                                            <RiFileLine className="h-6 w-6 text-gray-500" />
-                                                        </div>
-                                                        <div className="flex-grow">
-                                                            <div className="font-medium">{section.fileName || section.content}</div>
-                                                            <div className="text-sm text-gray-500">{section.fileType} • {section.fileSize}</div>
-                                                        </div>
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            size="sm" 
-                                                            className="text-primary"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation(); // Prevent triggering the parent onClick
-                                                                // In a real app, this would download the file
-                                                                alert('In a real app, this would download the file: ' + (section.fileName || section.content));
-                                                            }}
-                                                        >
-                                                            <RiDownloadLine className="h-4 w-4 mr-1" />
-                                                            Download
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Add rendering for resource link section */}
-                                        {section.type === "resource-link" && (
-                                            <div 
-                                                onClick={() => {
-                                                    if (editingSection !== section.id) {
-                                                        setEditingSection(section.id);
-                                                        setIsEditingStyle(false);
-                                                    }
-                                                }}
-                                                className="cursor-pointer"
-                                            >
-                                                {editingSection === section.id ? (
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">Select Resource</label>
-                                                            <Select
-                                                                value={section.resourceId || ''}
-                                                                onValueChange={(value) => {
-                                                                    // Find the selected resource
-                                                                    const selectedResource = [
-                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', price: '$50/hour', image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/conference-room-a' },
-                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', price: '$25/hour', image: 'https://images.unsplash.com/photo-1600508774634-4e11d34730e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/meeting-room-b' },
-                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', price: '$200/hour', image: 'https://images.unsplash.com/photo-1492135026582-f29f122ebb92?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/auditorium' },
-                                                                        { id: 'r4', title: 'Private Office', description: 'Quiet private office with desk and ergonomic chair', capacity: '1-2 people', price: 'Free for employees', image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/private-office' }
-                                                                    ].find(r => r.id === value);
-
-                                                                    if (selectedResource) {
-                                                                        updateSection(section.id, {
-                                                                            resourceId: value,
-                                                                            content: selectedResource.title,
-                                                                            description: selectedResource.description,
-                                                                            capacity: selectedResource.capacity,
-                                                                            price: selectedResource.price,
-                                                                            image: selectedResource.image,
-                                                                            link: selectedResource.url,
-                                                                            resourceType: value === 'r1' || value === 'r2' ? 'Conference Room' : value === 'r3' ? 'Auditorium' : 'Office Space'
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a resource" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="r1">Conference Room A</SelectItem>
-                                                                    <SelectItem value="r2">Meeting Room B</SelectItem>
-                                                                    <SelectItem value="r3">Auditorium</SelectItem>
-                                                                    <SelectItem value="r4">Private Office</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
-                                                            <Input
-                                                                value={section.ctaText || 'Book now →'}
-                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Call to action text"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="border rounded-md overflow-hidden">
-                                                        {section.image && (
-                                                            <img
-                                                                src={section.image}
-                                                                alt={section.content}
-                                                                className="w-full h-40 object-cover"
-                                                            />
-                                                        )}
-                                                        <div className="p-4">
-                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
-                                                            {section.description && (
-                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
-                                                            )}
-                                                            <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                                                                <div className="flex items-center">
-                                                                    <RiBookLine className="mr-1" />
-                                                                    {section.resourceType || 'Resource'}
-                                                                </div>
-                                                                <div className="flex items-center">
-                                                                    <span className="mr-1">👥</span>
-                                                                    {section.capacity || 'Capacity not specified'}
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-sm font-medium">
-                                                                    {section.price || 'Price not specified'}
-                                                                </span>
-                                                                <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
-                                                                    <RiReservedLine className="mr-1" />
-                                                                    {section.ctaText || 'Book now →'}
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Attachment section editor */}
-                                        {editingSection === section.id && section.type === "attachment" && (
-                                            <div className="mt-4 p-4 border rounded-md bg-gray-50">
-                                                <h4 className="font-medium mb-3">Edit Attachment</h4>
-                                                <div className="space-y-3">
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-1">File Name</label>
-                                                        <Input
-                                                            value={section.fileName || section.content}
-                                                            onChange={(e) => updateSection(section.id, { fileName: e.target.value, content: e.target.value })}
-                                                            placeholder="Enter file name"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-1">File Type</label>
-                                                        <Select
-                                                            value={section.fileType || 'PDF'}
-                                                            onValueChange={(value) => updateSection(section.id, { fileType: value })}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Select file type" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value="PDF">PDF</SelectItem>
-                                                                <SelectItem value="DOCX">Word Document</SelectItem>
-                                                                <SelectItem value="XLSX">Excel Spreadsheet</SelectItem>
-                                                                <SelectItem value="PPTX">PowerPoint</SelectItem>
-                                                                <SelectItem value="ZIP">ZIP Archive</SelectItem>
-                                                                <SelectItem value="TXT">Text File</SelectItem>
-                                                                <SelectItem value="IMG">Image</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-1">File Size</label>
-                                                        <Input
-                                                            value={section.fileSize || '125 KB'}
-                                                            onChange={(e) => updateSection(section.id, { fileSize: e.target.value })}
-                                                            placeholder="Enter file size"
-                                                        />
-                                                    </div>
-                                                    <div className="pt-2">
-                                                        <Button variant="outline" className="w-full">
-                                                            <RiAttachmentLine className="mr-2" />
-                                                            Upload File
-                                                        </Button>
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            In a real implementation, this would allow you to upload an actual file.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                                {sections.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
-                                        <div className="text-4xl text-gray-400 mb-4">
-                                            <RiMailLine />
-                                        </div>
-                                        <h3 className="text-lg font-medium text-gray-700 mb-2">Your email is empty</h3>
-                                        <p className="text-gray-500 mb-4">Add sections from the sidebar to start building your email</p>
+                                {/* Text alignment - Only show for non-button sections */}
+                                {sections.find(s => s.id === editingSection)?.type !== 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Text alignment</label>
                                         <div className="flex gap-2">
-                                            <Button onClick={() => addSection("header")}>Add Header</Button>
-                                            <Button variant="ghost" onClick={() => addSection("text")}>Add Text</Button>
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'left' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { textAlign: 'left' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignLeft className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'center' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { textAlign: 'center' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignCenter className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.textAlign === 'right' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { textAlign: 'right' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignRight className="h-4 w-4" />
+                                            </Button>
                                         </div>
+                                    </div>
+                                )}
+
+                                {/* Button color */}
+                                {sections.find(s => s.id === editingSection)?.type === 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Button Color</label>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="color"
+                                                value={sections.find(s => s.id === editingSection)?.buttonColor || '#007bff'}
+                                                onChange={(e) => updateSection(editingSection, { buttonColor: e.target.value })}
+                                                className="w-10 h-10 rounded-sm border border-gray-300"
+                                            />
+                                            <div className="text-sm text-gray-700 dark:text-gray-300 ml-2">
+                                                {sections.find(s => s.id === editingSection)?.buttonColor || '#007bff'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Button size */}
+                                {sections.find(s => s.id === editingSection)?.type === 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Button Size</label>
+                                        <Select
+                                            value={sections.find(s => s.id === editingSection)?.buttonSize || 'default'}
+                                            onValueChange={(value) => updateSection(editingSection, { buttonSize: value })}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select size" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="default">Default</SelectItem>
+                                                <SelectItem value="small">Small</SelectItem>
+                                                <SelectItem value="large">Large</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+
+                                {/* Button alignment */}
+                                {sections.find(s => s.id === editingSection)?.type === 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Button Alignment</label>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.buttonAlign === 'left' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { buttonAlign: 'left' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignLeft className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.buttonAlign === 'center' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { buttonAlign: 'center' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignCenter className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={sections.find(s => s.id === editingSection)?.buttonAlign === 'right' ? 'primary' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => updateSection(editingSection, { buttonAlign: 'right' })}
+                                                className="flex-1"
+                                            >
+                                                <RiAlignRight className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Image height */}
+                                {sections.find(s => s.id === editingSection)?.type === 'image' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Image Height</label>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="number"
+                                                value={sections.find(s => s.id === editingSection)?.imageHeight || '200px'}
+                                                onChange={(e) => updateSection(editingSection, { imageHeight: e.target.value })}
+                                                className="w-24 h-10 rounded-sm border border-gray-300"
+                                            />
+                                            <div className="text-sm text-gray-700 dark:text-gray-300 ml-2">
+                                                {sections.find(s => s.id === editingSection)?.imageHeight || '200px'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Image alt text */}
+                                {sections.find(s => s.id === editingSection)?.type === 'image' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Image Alt Text</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.imageAlt || 'Image description'}
+                                            onChange={(e) => updateSection(editingSection, { imageAlt: e.target.value })}
+                                            placeholder="Enter image alt text"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Link icon */}
+                                {sections.find(s => s.id === editingSection)?.type === 'content-link' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Link Icon</label>
+                                        <Select
+                                            value={sections.find(s => s.id === editingSection)?.linkIcon || 'article'}
+                                            onValueChange={(value) => updateSection(editingSection, { linkIcon: value })}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select link icon" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="article">Article</SelectItem>
+                                                <SelectItem value="calendar">Calendar</SelectItem>
+                                                <SelectItem value="book">Book</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+
+                                {/* Description */}
+                                {sections.find(s => s.id === editingSection)?.type !== 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Description</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.description || ''}
+                                            onChange={(e) => updateSection(editingSection, { description: e.target.value })}
+                                            placeholder="Enter description"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Content ID */}
+                                {sections.find(s => s.id === editingSection)?.type === 'content-link' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Content ID</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.contentId || ''}
+                                            onChange={(e) => updateSection(editingSection, { contentId: e.target.value })}
+                                            placeholder="Enter content ID"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Event ID */}
+                                {sections.find(s => s.id === editingSection)?.type === 'event-link' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Event ID</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.eventId || ''}
+                                            onChange={(e) => updateSection(editingSection, { eventId: e.target.value })}
+                                            placeholder="Enter event ID"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Resource ID */}
+                                {sections.find(s => s.id === editingSection)?.type === 'resource-link' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Resource ID</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.resourceId || ''}
+                                            onChange={(e) => updateSection(editingSection, { resourceId: e.target.value })}
+                                            placeholder="Enter resource ID"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* CTA Text */}
+                                {sections.find(s => s.id === editingSection)?.type !== 'button' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">CTA Text</label>
+                                        <Input
+                                            value={sections.find(s => s.id === editingSection)?.ctaText || ''}
+                                            onChange={(e) => updateSection(editingSection, { ctaText: e.target.value })}
+                                            placeholder="Enter call-to-action text"
+                                        />
                                     </div>
                                 )}
                             </div>
