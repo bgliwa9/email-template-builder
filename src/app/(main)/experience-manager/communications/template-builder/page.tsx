@@ -243,7 +243,6 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
     const [isBold, setIsBold] = useState(false);
     const [isItalic, setIsItalic] = useState(false);
     const [isUnderline, setIsUnderline] = useState(false);
-    const [textAlign, setTextAlign] = useState('left'); // Default alignment
     const editorRef = useRef<HTMLDivElement>(null);
     const [htmlContent, setHtmlContent] = useState(value);
     const isInitialRender = useRef(true);
@@ -253,12 +252,10 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
     const [linkUrl, setLinkUrl] = useState('');
     const [linkSelection, setLinkSelection] = useState<Range | null>(null);
     const [currentFontFamily, setCurrentFontFamily] = useState('Arial, sans-serif');
-    const [currentFontSize, setCurrentFontSize] = useState('16px');
+    // Remove duplicate currentFontSize
     const [currentColor, setCurrentColor] = useState('#000000');
     const [currentBackgroundColor, setCurrentBackgroundColor] = useState('transparent');
-    const [isBold, setIsBold] = useState(false);
-    const [isItalic, setIsItalic] = useState(false);
-    const [isUnderline, setIsUnderline] = useState(false);
+    // Remove duplicate isBold, isItalic, isUnderline
     const [isStrikethrough, setIsStrikethrough] = useState(false);
     const [alignment, setAlignment] = useState('left');
     const [headingLevel, setHeadingLevel] = useState('p');
@@ -450,11 +447,11 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
 
         // Check alignment
         if (document.queryCommandState('justifyCenter')) {
-            setTextAlign('center');
+            setAlignment('center');
         } else if (document.queryCommandState('justifyRight')) {
-            setTextAlign('right');
+            setAlignment('right');
         } else {
-            setTextAlign('left');
+            setAlignment('left');
         }
 
         // Check for text color
@@ -709,20 +706,24 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
         editorRef.current.focus();
 
         // Execute the command
-        document.execCommand('styleWithCSS', false, 'true');
         document.execCommand(command, false, value);
 
-        // Update formatting state immediately for better UX
-        if (command === 'bold') setIsBold(document.queryCommandState('bold'));
-        if (command === 'italic') setIsItalic(document.queryCommandState('italic'));
-        if (command === 'underline') setIsUnderline(document.queryCommandState('underline'));
+        // Update formatting states
+        if (command === 'bold') {
+            setIsBold(!isBold);
+        } else if (command === 'italic') {
+            setIsItalic(!isItalic);
+        } else if (command === 'underline') {
+            setIsUnderline(!isUnderline);
+        } else if (command === 'justifyLeft') {
+            setAlignment('left');
+        } else if (command === 'justifyCenter') {
+            setAlignment('center');
+        } else if (command === 'justifyRight') {
+            setAlignment('right');
+        }
 
-        // Update alignment state
-        if (command === 'justifyLeft') setTextAlign('left');
-        if (command === 'justifyCenter') setTextAlign('center');
-        if (command === 'justifyRight') setTextAlign('right');
-
-        // Update content state
+        // Trigger content change
         handleContentChange();
     };
 
@@ -1354,7 +1355,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 <Tooltip content="Align left">
                     <Button
                         variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'left' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                        className={`h-8 w-8 p-0 ${alignment === 'left' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
                         onClick={() => execFormatCommand('justifyLeft')}
                     >
                         <RiAlignLeft className="h-4 w-4" />
@@ -1363,7 +1364,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 <Tooltip content="Align center">
                     <Button
                         variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'center' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                        className={`h-8 w-8 p-0 ${alignment === 'center' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
                         onClick={() => execFormatCommand('justifyCenter')}
                     >
                         <RiAlignCenter className="h-4 w-4" />
@@ -1372,7 +1373,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
                 <Tooltip content="Align right">
                     <Button
                         variant="ghost"
-                        className={`h-8 w-8 p-0 ${textAlign === 'right' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                        className={`h-8 w-8 p-0 ${alignment === 'right' ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
                         onClick={() => execFormatCommand('justifyRight')}
                     >
                         <RiAlignRight className="h-4 w-4" />
