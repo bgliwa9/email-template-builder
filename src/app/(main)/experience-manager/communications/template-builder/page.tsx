@@ -2084,7 +2084,7 @@ export default function EmailTemplateBuilder() {
             price: type === "resource-link" ? '$50/hour' : undefined,
             ctaText: type === "resource-link" ? 'Book now →' : undefined,
             description: type === "resource-link" ? 'Large conference room with projector and whiteboard' : undefined,
-            image: type === "resource-link" ? 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A' : undefined
+            image: type === "resource-link" ? 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80' : undefined
         }
         setSections([...sections, newSection])
     }
@@ -2874,9 +2874,9 @@ export default function EmailTemplateBuilder() {
                                                                 onValueChange={(value) => {
                                                                     // Find the selected content
                                                                     const selectedContent = [
-                                                                        { id: 'c1', title: 'How to Improve Customer Engagement', description: 'Learn effective strategies to boost customer engagement and retention through personalized communication.', image: 'https://placehold.co/600x300/4f46e5/ffffff?text=Customer+Engagement', url: '/blog/customer-engagement' },
-                                                                        { id: 'c2', title: 'Email Marketing Best Practices', description: 'Discover the latest best practices in email marketing to increase open rates and conversions.', image: 'https://placehold.co/600x300/0ea5e9/ffffff?text=Email+Marketing', url: '/blog/email-marketing' },
-                                                                        { id: 'c3', title: 'Product Update: New Features', description: 'Explore the exciting new features we have added to our platform to enhance your experience.', image: 'https://placehold.co/600x300/10b981/ffffff?text=Product+Update', url: '/updates/new-features' }
+                                                                        { id: 'c1', title: 'Getting Started Guide', description: 'A comprehensive guide to help you get started with our platform.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/getting-started' },
+                                                                        { id: 'c2', title: 'Product Updates', description: 'Learn about the latest features and improvements to our platform.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/product-updates' },
+                                                                        { id: 'c3', title: 'Best Practices', description: 'Tips and tricks to get the most out of our platform.', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/content/best-practices' }
                                                                     ].find(c => c.id === value);
 
                                                                     if (selectedContent) {
@@ -2894,9 +2894,9 @@ export default function EmailTemplateBuilder() {
                                                                     <SelectValue placeholder="Select content" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                    <SelectItem value="c1">How to Improve Customer Engagement</SelectItem>
-                                                                    <SelectItem value="c2">Email Marketing Best Practices</SelectItem>
-                                                                    <SelectItem value="c3">Product Update: New Features</SelectItem>
+                                                                    <SelectItem value="c1">Getting Started Guide</SelectItem>
+                                                                    <SelectItem value="c2">Product Updates</SelectItem>
+                                                                    <SelectItem value="c3">Best Practices</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -2962,9 +2962,9 @@ export default function EmailTemplateBuilder() {
                                                                 onValueChange={(value) => {
                                                                     // Find the selected event
                                                                     const selectedEvent = [
-                                                                        { id: 'e1', title: 'Annual Customer Conference', description: 'Join us for our annual customer conference featuring industry experts and networking opportunities.', date: 'June 15-17, 2023', location: 'San Francisco, CA', image: 'https://placehold.co/600x300/f97316/ffffff?text=Annual+Conference', url: '/events/annual-conference' },
-                                                                        { id: 'e2', title: 'Product Webinar Series', description: 'Learn how to maximize your productivity with our latest features in this interactive webinar.', date: 'July 8, 2023', location: 'Online', image: 'https://placehold.co/600x300/ec4899/ffffff?text=Webinar+Series', url: '/events/webinar-series' },
-                                                                        { id: 'e3', title: 'Industry Roundtable Discussion', description: 'Participate in our exclusive roundtable discussion with industry leaders on emerging trends.', date: 'August 22, 2023', location: 'New York, NY', image: 'https://placehold.co/600x300/8b5cf6/ffffff?text=Roundtable', url: '/events/roundtable' }
+                                                                        { id: 'e1', title: 'Annual Customer Conference', description: 'Join us for our annual customer conference featuring industry experts and networking opportunities.', date: 'June 15-17, 2023', location: 'San Francisco, CA', image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/annual-conference' },
+                                                                        { id: 'e2', title: 'Product Webinar Series', description: 'Learn how to maximize your productivity with our latest features in this interactive webinar.', date: 'July 8, 2023', location: 'Online', image: 'https://images.unsplash.com/photo-1591115765373-5207764f72e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/webinar-series' },
+                                                                        { id: 'e3', title: 'Industry Roundtable Discussion', description: 'Participate in our exclusive roundtable discussion with industry leaders on emerging trends.', date: 'August 22, 2023', location: 'New York, NY', image: 'https://images.unsplash.com/photo-1582192730841-2a682d7375f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/events/roundtable' }
                                                                     ].find(e => e.id === value);
 
                                                                     if (selectedEvent) {
@@ -3102,10 +3102,10 @@ export default function EmailTemplateBuilder() {
                                                                 onValueChange={(value) => {
                                                                     // Find the selected resource
                                                                     const selectedResource = [
-                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', price: '$50/hour', image: 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A', url: '/resources/conference-room-a' },
-                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', price: '$25/hour', image: 'https://placehold.co/600x300/10b981/ffffff?text=Meeting+Room+B', url: '/resources/meeting-room-b' },
-                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', price: '$200/hour', image: 'https://placehold.co/600x300/f59e0b/ffffff?text=Auditorium', url: '/resources/auditorium' },
-                                                                        { id: 'r4', title: 'Private Office', description: 'Quiet private office with desk and ergonomic chair', capacity: '1-2 people', price: 'Free for employees', image: 'https://placehold.co/600x300/6366f1/ffffff?text=Private+Office', url: '/resources/private-office' }
+                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', price: '$50/hour', image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/conference-room-a' },
+                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', price: '$25/hour', image: 'https://images.unsplash.com/photo-1600508774634-4e11d34730e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/meeting-room-b' },
+                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', price: '$200/hour', image: 'https://images.unsplash.com/photo-1492135026582-f29f122ebb92?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/auditorium' },
+                                                                        { id: 'r4', title: 'Private Office', description: 'Quiet private office with desk and ergonomic chair', capacity: '1-2 people', price: 'Free for employees', image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', url: '/resources/private-office' }
                                                                     ].find(r => r.id === value);
 
                                                                     if (selectedResource) {
