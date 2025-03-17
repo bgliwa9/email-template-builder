@@ -251,11 +251,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
     const [showLinkPopover, setShowLinkPopover] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [linkSelection, setLinkSelection] = useState<Range | null>(null);
-    const [currentFontFamily, setCurrentFontFamily] = useState('Arial, sans-serif');
-    // Remove duplicate currentFontSize
-    const [currentColor, setCurrentColor] = useState('#000000');
     const [currentBackgroundColor, setCurrentBackgroundColor] = useState('transparent');
-    // Remove duplicate isBold, isItalic, isUnderline
     const [isStrikethrough, setIsStrikethrough] = useState(false);
     const [alignment, setAlignment] = useState('left');
     const [headingLevel, setHeadingLevel] = useState('p');
@@ -317,7 +313,7 @@ const RichTextEditor = ({ value, onChange, className, sectionType = 'text', ...p
             if (style) {
                 const bgColorMatch = style.match(/background-color:\s*([^;]+)/);
                 if (bgColorMatch && bgColorMatch[1]) {
-                    setCurrentBackgroundColor(bgColorMatch[1].trim());
+                    setCurrentBgColor(bgColorMatch[1].trim());
                 }
             }
         }
