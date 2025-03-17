@@ -15,7 +15,7 @@ import {
     RiCheckLine, RiDeleteBin6Line, RiDeleteBinLine, RiDownloadLine, RiDragMove2Line, 
     RiEdit2Line, RiFileLine, RiImage2Line, RiItalic, RiLink, RiListOrdered, 
     RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, 
-    RiSendPlaneLine, RiSettings4Line, RiUnderline
+    RiSendPlaneLine, RiSettings4Line, RiUnderline, RiBookLine, RiReservedLine
 } from "@remixicon/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
@@ -1932,6 +1932,11 @@ type Section = {
     fileName?: string
     fileType?: string
     fileSize?: string
+    // Resource properties
+    resourceId?: string
+    resourceType?: string
+    capacity?: string
+    availability?: string
 }
 
 // Add this function before the EmailTemplateBuilder component
@@ -2057,8 +2062,9 @@ export default function EmailTemplateBuilder() {
                                 type === "content-link" ? "Link to content" :
                                     type === "event-link" ? "Link to event" :
                                         type === "attachment" ? "Document.pdf" :
-                                            "<p>Footer content</p>",
-            link: type === "button" || type === "content-link" || type === "event-link" ? "#" : undefined,
+                                            type === "resource-link" ? "Conference Room A" :
+                                                "<p>Footer content</p>",
+            link: type === "button" || type === "content-link" || type === "event-link" || type === "resource-link" ? "#" : undefined,
             backgroundColor: 'transparent',
             textAlign: 'left' as 'left' | 'center' | 'right',
             padding: type === "spacer" ? '2rem' : '1rem',
@@ -2068,10 +2074,15 @@ export default function EmailTemplateBuilder() {
             buttonAlign: type === "button" ? 'center' as 'center' : undefined,
             imageHeight: type === "image" ? '200px' : undefined,
             imageAlt: type === "image" ? 'Image description' : undefined,
-            linkIcon: type === "content-link" ? 'article' : type === "event-link" ? 'calendar' : undefined,
+            linkIcon: type === "content-link" ? 'article' : type === "event-link" ? 'calendar' : type === "resource-link" ? 'book' : undefined,
             fileSize: type === "attachment" ? '125 KB' : undefined,
             fileType: type === "attachment" ? 'PDF' : undefined,
-            fileName: type === "attachment" ? 'Document.pdf' : undefined
+            fileName: type === "attachment" ? 'Document.pdf' : undefined,
+            resourceId: type === "resource-link" ? 'r1' : undefined,
+            resourceType: type === "resource-link" ? 'Conference Room' : undefined,
+            capacity: type === "resource-link" ? '20 people' : undefined,
+            availability: type === "resource-link" ? 'Available' : undefined,
+            ctaText: type === "resource-link" ? 'Book now →' : undefined
         }
         setSections([...sections, newSection])
     }
@@ -2330,6 +2341,10 @@ export default function EmailTemplateBuilder() {
                                 <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("event-link")}>
                                     <RiCalendarEventLine className="text-xl mb-1" />
                                     <span className="text-sm">Event link</span>
+                                </Button>
+                                <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("resource-link")}>
+                                    <RiBookLine className="text-xl mb-1" />
+                                    <span className="text-sm">Resource</span>
                                 </Button>
                                 <Button variant="ghost" className="h-auto py-4 flex flex-col items-center border border-gray-200" onClick={() => addSection("footer")}>
                                     <span className="text-xl mb-1">F</span>
@@ -3062,6 +3077,104 @@ export default function EmailTemplateBuilder() {
                                                         </Button>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        )}
+
+                                        {/* Add rendering for resource link section */}
+                                        {section.type === "resource-link" && (
+                                            <div 
+                                                onClick={() => {
+                                                    if (editingSection !== section.id) {
+                                                        setEditingSection(section.id);
+                                                        setIsEditingStyle(false);
+                                                    }
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                {editingSection === section.id ? (
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1">Select Resource</label>
+                                                            <Select
+                                                                value={section.resourceId || ''}
+                                                                onValueChange={(value) => {
+                                                                    // Find the selected resource
+                                                                    const selectedResource = [
+                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', availability: 'Available', image: 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A', url: '/resources/conference-room-a' },
+                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', availability: 'Available', image: 'https://placehold.co/600x300/10b981/ffffff?text=Meeting+Room+B', url: '/resources/meeting-room-b' },
+                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', availability: 'Limited Availability', image: 'https://placehold.co/600x300/f59e0b/ffffff?text=Auditorium', url: '/resources/auditorium' }
+                                                                    ].find(r => r.id === value);
+
+                                                                    if (selectedResource) {
+                                                                        updateSection(section.id, {
+                                                                            resourceId: value,
+                                                                            content: selectedResource.title,
+                                                                            description: selectedResource.description,
+                                                                            capacity: selectedResource.capacity,
+                                                                            availability: selectedResource.availability,
+                                                                            image: selectedResource.image,
+                                                                            link: selectedResource.url,
+                                                                            resourceType: value === 'r1' || value === 'r2' ? 'Conference Room' : 'Auditorium'
+                                                                        });
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Select a resource" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="r1">Conference Room A</SelectItem>
+                                                                    <SelectItem value="r2">Meeting Room B</SelectItem>
+                                                                    <SelectItem value="r3">Auditorium</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-sm font-medium mb-1">CTA Text</label>
+                                                            <Input
+                                                                value={section.ctaText || 'Book now →'}
+                                                                onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
+                                                                placeholder="Call to action text"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="border rounded-md overflow-hidden">
+                                                        {section.image && (
+                                                            <img
+                                                                src={section.image}
+                                                                alt={section.content}
+                                                                className="w-full h-40 object-cover"
+                                                            />
+                                                        )}
+                                                        <div className="p-4">
+                                                            <h3 className="font-bold text-lg mb-2">{section.content}</h3>
+                                                            {section.description && (
+                                                                <p className="text-sm text-gray-600 mb-3">{section.description}</p>
+                                                            )}
+                                                            <div className="flex items-center text-sm text-gray-600 space-x-4 mb-3">
+                                                                <div className="flex items-center">
+                                                                    <RiBookLine className="mr-1" />
+                                                                    {section.resourceType || 'Resource'}
+                                                                </div>
+                                                                <div className="flex items-center">
+                                                                    <span className="mr-1">👥</span>
+                                                                    {section.capacity || 'Capacity not specified'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex justify-between items-center">
+                                                                <span className={`text-sm px-2 py-1 rounded-full ${section.availability === 'Available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    {section.availability || 'Status unknown'}
+                                                                </span>
+                                                                <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
+                                                                    <RiReservedLine className="mr-1" />
+                                                                    {section.ctaText || 'Book now →'}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 
