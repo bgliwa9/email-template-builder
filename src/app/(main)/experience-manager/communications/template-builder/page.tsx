@@ -1936,7 +1936,7 @@ type Section = {
     resourceId?: string
     resourceType?: string
     capacity?: string
-    availability?: string
+    price?: string
 }
 
 // Add this function before the EmailTemplateBuilder component
@@ -2081,8 +2081,10 @@ export default function EmailTemplateBuilder() {
             resourceId: type === "resource-link" ? 'r1' : undefined,
             resourceType: type === "resource-link" ? 'Conference Room' : undefined,
             capacity: type === "resource-link" ? '20 people' : undefined,
-            availability: type === "resource-link" ? 'Available' : undefined,
-            ctaText: type === "resource-link" ? 'Book now →' : undefined
+            price: type === "resource-link" ? '$50/hour' : undefined,
+            ctaText: type === "resource-link" ? 'Book now →' : undefined,
+            description: type === "resource-link" ? 'Large conference room with projector and whiteboard' : undefined,
+            image: type === "resource-link" ? 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A' : undefined
         }
         setSections([...sections, newSection])
     }
@@ -3100,9 +3102,10 @@ export default function EmailTemplateBuilder() {
                                                                 onValueChange={(value) => {
                                                                     // Find the selected resource
                                                                     const selectedResource = [
-                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', availability: 'Available', image: 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A', url: '/resources/conference-room-a' },
-                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', availability: 'Available', image: 'https://placehold.co/600x300/10b981/ffffff?text=Meeting+Room+B', url: '/resources/meeting-room-b' },
-                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', availability: 'Limited Availability', image: 'https://placehold.co/600x300/f59e0b/ffffff?text=Auditorium', url: '/resources/auditorium' }
+                                                                        { id: 'r1', title: 'Conference Room A', description: 'Large conference room with projector and whiteboard', capacity: '20 people', price: '$50/hour', image: 'https://placehold.co/600x300/3b82f6/ffffff?text=Conference+Room+A', url: '/resources/conference-room-a' },
+                                                                        { id: 'r2', title: 'Meeting Room B', description: 'Small meeting room with video conferencing equipment', capacity: '8 people', price: '$25/hour', image: 'https://placehold.co/600x300/10b981/ffffff?text=Meeting+Room+B', url: '/resources/meeting-room-b' },
+                                                                        { id: 'r3', title: 'Auditorium', description: 'Large auditorium with stage and seating for presentations', capacity: '100 people', price: '$200/hour', image: 'https://placehold.co/600x300/f59e0b/ffffff?text=Auditorium', url: '/resources/auditorium' },
+                                                                        { id: 'r4', title: 'Private Office', description: 'Quiet private office with desk and ergonomic chair', capacity: '1-2 people', price: 'Free for employees', image: 'https://placehold.co/600x300/6366f1/ffffff?text=Private+Office', url: '/resources/private-office' }
                                                                     ].find(r => r.id === value);
 
                                                                     if (selectedResource) {
@@ -3111,10 +3114,10 @@ export default function EmailTemplateBuilder() {
                                                                             content: selectedResource.title,
                                                                             description: selectedResource.description,
                                                                             capacity: selectedResource.capacity,
-                                                                            availability: selectedResource.availability,
+                                                                            price: selectedResource.price,
                                                                             image: selectedResource.image,
                                                                             link: selectedResource.url,
-                                                                            resourceType: value === 'r1' || value === 'r2' ? 'Conference Room' : 'Auditorium'
+                                                                            resourceType: value === 'r1' || value === 'r2' ? 'Conference Room' : value === 'r3' ? 'Auditorium' : 'Office Space'
                                                                         });
                                                                     }
                                                                 }}
@@ -3126,6 +3129,7 @@ export default function EmailTemplateBuilder() {
                                                                     <SelectItem value="r1">Conference Room A</SelectItem>
                                                                     <SelectItem value="r2">Meeting Room B</SelectItem>
                                                                     <SelectItem value="r3">Auditorium</SelectItem>
+                                                                    <SelectItem value="r4">Private Office</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -3153,7 +3157,7 @@ export default function EmailTemplateBuilder() {
                                                             {section.description && (
                                                                 <p className="text-sm text-gray-600 mb-3">{section.description}</p>
                                                             )}
-                                                            <div className="flex items-center text-sm text-gray-600 space-x-4 mb-3">
+                                                            <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                                                                 <div className="flex items-center">
                                                                     <RiBookLine className="mr-1" />
                                                                     {section.resourceType || 'Resource'}
@@ -3164,8 +3168,8 @@ export default function EmailTemplateBuilder() {
                                                                 </div>
                                                             </div>
                                                             <div className="flex justify-between items-center">
-                                                                <span className={`text-sm px-2 py-1 rounded-full ${section.availability === 'Available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                                                    {section.availability || 'Status unknown'}
+                                                                <span className="text-sm font-medium">
+                                                                    {section.price || 'Price not specified'}
                                                                 </span>
                                                                 <a href={section.link} className="text-primary hover:underline text-sm flex items-center">
                                                                     <RiReservedLine className="mr-1" />
