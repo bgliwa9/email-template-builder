@@ -7,6 +7,7 @@ import { PageTemplate } from "@/components/PageTemplate"
 import { RiAddLine, RiMailLine, RiMoreLine, RiPencilLine, RiSearchLine } from "@remixicon/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { templateData } from "@/lib/templates"
 
 // Define tabs for the Communications page
 const tabs = [
@@ -15,70 +16,6 @@ const tabs = [
     { name: "Drafts", href: "/experience-manager/communications/drafts" },
     { name: "Scheduled", href: "/experience-manager/communications/scheduled" },
     { name: "Templates", href: "/experience-manager/communications/templates" },
-]
-
-// Sample template data
-const templateData = [
-    {
-        id: "welcome",
-        name: "Welcome Email",
-        description: "A warm welcome email for new users",
-        lastModified: "2 days ago",
-        category: "Onboarding",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Welcome+Email",
-        createdAt: "2023-12-15",
-        author: "John Smith"
-    },
-    {
-        id: "announcement",
-        name: "Announcement",
-        description: "Announce important news or updates",
-        lastModified: "1 week ago",
-        category: "Newsletter",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Announcement",
-        createdAt: "2023-11-01",
-        author: "Sarah Johnson"
-    },
-    {
-        id: "newsletter",
-        name: "Monthly Newsletter",
-        description: "Regular updates and news for your subscribers",
-        lastModified: "3 days ago",
-        category: "Newsletter",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Monthly+Newsletter",
-        createdAt: "2024-01-10",
-        author: "Michael Brown"
-    },
-    {
-        id: "template4",
-        name: "Product Announcement",
-        description: "Announce new products or features",
-        lastModified: "5 days ago",
-        category: "Marketing",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Product+Announcement",
-        createdAt: "2024-02-05",
-        author: "Emily Davis"
-    },
-    {
-        id: "template5",
-        name: "Thank You Email",
-        description: "Express gratitude to your users",
-        lastModified: "1 day ago",
-        category: "Engagement",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Thank+You",
-        createdAt: "2024-02-20",
-        author: "David Wilson"
-    },
-    {
-        id: "template6",
-        name: "Feedback Request",
-        description: "Ask users for their feedback",
-        lastModified: "4 days ago",
-        category: "Engagement",
-        thumbnail: "https://placehold.co/300x200/4f46e5/ffffff?text=Feedback+Request",
-        createdAt: "2024-03-01",
-        author: "Lisa Martinez"
-    }
 ]
 
 // Get unique categories for filter options
@@ -189,11 +126,17 @@ export default function TemplatesPage() {
                         {filteredTemplates.map((template) => (
                             <Card key={template.id} className="overflow-hidden group">
                                 <div className="relative h-40 overflow-hidden">
-                                    <img 
-                                        src={template.thumbnail} 
-                                        alt={template.name} 
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
+                                    {typeof template.thumbnail === 'string' && template.thumbnail.startsWith('http') ? (
+                                        <img 
+                                            src={template.thumbnail} 
+                                            alt={template.name} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-8xl group-hover:scale-105 transition-transform duration-300">
+                                            {template.thumbnail}
+                                        </div>
+                                    )}
                                     <div className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-md px-2 py-1 text-xs font-medium">
                                         {template.category}
                                     </div>

@@ -15,10 +15,12 @@ import {
     RiCheckLine, RiDeleteBin6Line, RiDeleteBinLine, RiDownloadLine, RiDragMove2Line, 
     RiEdit2Line, RiFileLine, RiImage2Line, RiItalic, RiLink, RiListOrdered, 
     RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, 
-    RiSendPlaneLine, RiSettings4Line, RiUnderline, RiBookLine, RiReservedLine
+    RiSendPlaneLine, RiSettings4Line, RiUnderline, RiBookLine, RiReservedLine,
+    RiArrowUpSLine, RiArrowLeftSLine, RiArrowRightSLine, RiCloseLine, RiImageLine, RiFileTextLine, RiCalendarLine, RiAttachment2, RiMapPin2Line, RiBookmarkLine
 } from "@remixicon/react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { templateData, createDefaultTemplate, type Section as SectionType } from "@/lib/templates"
 
 // Custom Tooltip component
 const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
@@ -1558,88 +1560,6 @@ const CardFooter = ({ className, children }: { className?: string; children: Rea
     <div className={`flex items-center justify-end space-x-2 pt-4 ${className || ''}`}>{children}</div>
 );
 
-// Prebuilt template definitions
-const prebuiltTemplates = [
-    {
-        id: 'welcome',
-        name: 'Welcome email',
-        description: 'A warm welcome message for new users',
-        subject: 'Welcome to our community!',
-        thumbnail: '📧',
-        sections: [
-            { id: 101, type: "header", content: "<h1 style='color: #4a86e8; font-weight: bold;'>Welcome to our community!</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 102, type: "text", content: "We're <strong>thrilled</strong> to have you join us. Here's everything you need to know to <em>get started</em>.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 103, type: "button", content: "Get Started", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'default' },
-            { id: 104, type: "footer", content: "© 2025 Your Company. All rights reserved.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    },
-    {
-        id: 'announcement',
-        name: 'Announcement',
-        description: 'Announce important news or updates',
-        subject: 'Important announcement',
-        thumbnail: '📢',
-        sections: [
-            { id: 201, type: "header", content: "<h2 style='color: #e74c3c; font-weight: bold;'>Important Announcement</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 202, type: "text", content: "We have some <strong>exciting news</strong> to share with you! Our <span style='color: #27ae60;'>new feature</span> is now available.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 203, type: "button", content: "Learn more", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'secondary', buttonSize: 'default' },
-            { id: 204, type: "footer", content: "© 2025 Your Company. All rights reserved.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    },
-    {
-        id: 'newsletter',
-        name: 'Monthly newsletter',
-        description: 'Regular updates and news digest',
-        subject: 'Your monthly newsletter',
-        thumbnail: '📰',
-        sections: [
-            { id: 301, type: "header", content: "<h1 style='color: #9b59b6; font-weight: bold;'>Your Monthly Newsletter</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 302, type: "text", content: "<h3>This Month's Highlights:</h3><ul><li><strong>New Feature Launch</strong>: We've released our new dashboard.</li><li><strong>Community Spotlight</strong>: Meet our most active members.</li><li><strong>Upcoming Events</strong>: Don't miss our webinar next week.</li></ul>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 303, type: "button", content: "Read full newsletter", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'lg' },
-            { id: 304, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>You're receiving this email because you subscribed to our newsletter.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    },
-    {
-        id: 'invitation',
-        name: 'Event invitation',
-        description: 'Invite users to an upcoming event',
-        subject: 'You\'re invited!',
-        thumbnail: '🎉',
-        sections: [
-            { id: 401, type: "header", content: "<h1 style='color: #f39c12; font-weight: bold;'>You're Invited!</h1>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 402, type: "text", content: "Join us for our <strong>annual conference</strong> on <span style='background-color: #f8f9fa; padding: 2px 4px;'>June 15-17, 2025</span>. It's going to be an amazing event with speakers from around the world.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 403, type: "button", content: "RSVP now", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'destructive', buttonSize: 'default' },
-            { id: 404, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Location: Grand Hotel, 123 Main St, Anytown", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    },
-    {
-        id: 'confirmation',
-        name: 'Order confirmation',
-        description: 'Confirm a user\'s purchase or order',
-        subject: 'Your order confirmation',
-        thumbnail: '✅',
-        sections: [
-            { id: 501, type: "header", content: "<h2 style='color: #2ecc71; font-weight: bold;'>Order Confirmation</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 502, type: "text", content: "Thank you for your order! Your order <strong>#12345</strong> has been confirmed and is being processed.<br><br><span style='color: #7f8c8d;'>Order details:</span><br>1x Product A - $29.99<br>2x Product B - $39.98<br><strong>Total: $69.97</strong>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 503, type: "button", content: "Track order", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'primary', buttonSize: 'default' },
-            { id: 504, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>Questions? Contact our support team.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    },
-    {
-        id: 'feedback',
-        name: 'Feedback request',
-        description: 'Ask users for their feedback',
-        subject: 'We value your feedback',
-        thumbnail: '💬',
-        sections: [
-            { id: 601, type: "header", content: "<h2 style='color: #3498db; font-weight: bold;'>We Value Your Feedback</h2>", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 602, type: "text", content: "We're constantly working to improve our service and would love to hear your thoughts. <strong>Your feedback</strong> helps us make our product better for everyone.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' },
-            { id: 603, type: "button", content: "Take our survey", link: "#", backgroundColor: 'transparent', textAlign: 'center' as const, padding: '1rem', margin: '0', buttonColor: 'ghost', buttonSize: 'default' },
-            { id: 604, type: "footer", content: "© 2025 Your Company. All rights reserved.<br>This survey will take approximately 5 minutes to complete.", backgroundColor: 'transparent', textAlign: 'left' as const, padding: '1rem', margin: '0' }
-        ]
-    }
-];
-
 // Define a Section type to fix type errors
 type Section = {
     backgroundColor: string
@@ -1735,10 +1655,10 @@ export default function EmailTemplateBuilder() {
     }, [templateIdParam, skipSelectionParam])
 
     const selectTemplate = (templateId: string) => {
-        // First try to find the template in prebuiltTemplates
-        const template = prebuiltTemplates.find(t => t.id === templateId);
+        // First try to find the template in templateData
+        const template = templateData.find(t => t.id === templateId);
         
-        if (template) {
+        if (template && template.sections) {
             setSelectedTemplate(templateId);
             setSections(template.sections.map(section => ({
                 ...section,
@@ -1749,42 +1669,17 @@ export default function EmailTemplateBuilder() {
             })));
             setSubject(template.subject || '');
         } else {
-            // If template not found in prebuiltTemplates, create a default template
-            // This handles templates from the templates page that don't exist in prebuiltTemplates
-            console.log(`Template ${templateId} not found in prebuiltTemplates, creating default template`);
+            // If template not found in templateData, create a default template
+            console.log(`Template ${templateId} not found in templateData, creating default template`);
+            const defaultTemplate = createDefaultTemplate(templateId);
             setSelectedTemplate(templateId);
             
-            // Create default sections for the template
-            setSections([
-                { 
-                    id: 101, 
-                    type: "header", 
-                    content: "<h1 style='color: #4a86e8; font-weight: bold;'>Email Template</h1>", 
-                    backgroundColor: 'transparent', 
-                    textAlign: 'left' as const, 
-                    padding: '1rem', 
-                    margin: '0' 
-                },
-                { 
-                    id: 102, 
-                    type: "text", 
-                    content: "This is a sample email template. Edit this content to create your message.", 
-                    backgroundColor: 'transparent', 
-                    textAlign: 'left' as const, 
-                    padding: '1rem', 
-                    margin: '0' 
-                },
-                { 
-                    id: 103, 
-                    type: "footer", 
-                    content: "© 2025 Your Company. All rights reserved.", 
-                    backgroundColor: 'transparent', 
-                    textAlign: 'left' as const, 
-                    padding: '1rem', 
-                    margin: '0' 
-                }
-            ]);
-            setSubject('New Email Template');
+            if (defaultTemplate.sections) {
+                setSections(defaultTemplate.sections);
+            } else {
+                setSections([]);
+            }
+            setSubject(defaultTemplate.subject);
         }
     }
 
@@ -1982,7 +1877,7 @@ export default function EmailTemplateBuilder() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {prebuiltTemplates.map((template) => (
+                    {templateData.map((template) => (
                         <div
                             key={template.id}
                             className={`cursor-pointer rounded-lg border p-4 transition-all hover:shadow-md ${selectedTemplate === template.id ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 dark:border-gray-800'}`}
@@ -1998,7 +1893,7 @@ export default function EmailTemplateBuilder() {
 
                             <div className="mt-4 text-xs text-gray-500">
                                 <p><strong>Subject:</strong> {template.subject}</p>
-                                <p className="mt-1"><strong>Sections:</strong> {template.sections.length}</p>
+                                <p className="mt-1"><strong>Sections:</strong> {template.sections?.length || 0}</p>
                             </div>
 
                             {selectedTemplate === template.id && (
