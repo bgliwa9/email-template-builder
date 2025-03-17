@@ -2964,7 +2964,7 @@ export default function EmailTemplateBuilder() {
                                                                 }}
                                                             >
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select event" />
+                                                                    <SelectValue placeholder="Select an event" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectItem value="e1">Annual Customer Conference</SelectItem>
@@ -2979,35 +2979,9 @@ export default function EmailTemplateBuilder() {
                                                             <Input
                                                                 value={section.ctaText || 'Register now →'}
                                                                 onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                                                                placeholder="Enter call-to-action text"
+                                                                placeholder="Call to action text"
                                                             />
                                                         </div>
-
-                                                        {section.eventId && (
-                                                            <div className="border rounded-md p-4 bg-gray-50">
-                                                                <div className="text-sm font-medium mb-2">Preview</div>
-                                                                <div className="space-y-3">
-                                                                    <img
-                                                                        src={section.image}
-                                                                        alt={section.content}
-                                                                        className="w-full h-40 object-cover rounded-md"
-                                                                    />
-                                                                    <h3 className="font-bold text-lg">{section.content}</h3>
-                                                                    <p className="text-sm text-gray-600">{section.description}</p>
-                                                                    <div className="flex items-center text-sm text-gray-600 space-x-4">
-                                                                        <div className="flex items-center">
-                                                                            <RiCalendarEventLine className="mr-1" />
-                                                                            {section.date}
-                                                                        </div>
-                                                                        <div className="flex items-center">
-                                                                            <span className="mr-1">📍</span>
-                                                                            {section.location}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="text-primary text-sm">{section.ctaText || 'Register now →'}</div>
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 ) : (
                                                     <div className="border rounded-md overflow-hidden">
@@ -3042,6 +3016,52 @@ export default function EmailTemplateBuilder() {
                                                         </div>
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+
+                                        {/* Add rendering for attachment section */}
+                                        {section.type === "attachment" && (
+                                            <div 
+                                                onClick={() => {
+                                                    if (editingSection !== section.id) {
+                                                        setEditingSection(section.id);
+                                                        setIsEditingStyle(false);
+                                                    }
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div
+                                                    style={{
+                                                        backgroundColor: section.backgroundColor === 'transparent' ? 'transparent' : section.backgroundColor,
+                                                        padding: section.padding,
+                                                        margin: section.margin,
+                                                        textAlign: section.textAlign
+                                                    }}
+                                                    className="border border-gray-200 rounded-md p-4"
+                                                >
+                                                    <div className="flex items-center">
+                                                        <div className="bg-gray-100 p-3 rounded-md mr-3">
+                                                            <RiFileLine className="h-6 w-6 text-gray-500" />
+                                                        </div>
+                                                        <div className="flex-grow">
+                                                            <div className="font-medium">{section.fileName || section.content}</div>
+                                                            <div className="text-sm text-gray-500">{section.fileType} • {section.fileSize}</div>
+                                                        </div>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="sm" 
+                                                            className="text-primary"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // Prevent triggering the parent onClick
+                                                                // In a real app, this would download the file
+                                                                alert('In a real app, this would download the file: ' + (section.fileName || section.content));
+                                                            }}
+                                                        >
+                                                            <RiDownloadLine className="h-4 w-4 mr-1" />
+                                                            Download
+                                                        </Button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
 
