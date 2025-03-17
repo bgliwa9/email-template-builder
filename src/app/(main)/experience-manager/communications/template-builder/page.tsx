@@ -1951,34 +1951,13 @@ const getContrastRatio = (hexColor: string): string => {
 
 export default function EmailTemplateBuilder() {
     const router = useRouter()
-    const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
-    
-    // Get query parameters
-    const queryTemplate = searchParams.get('template')
-    const querySubject = searchParams.get('subject')
-    const queryAudience = searchParams.get('audience')
-    const querySendTime = searchParams.get('sendTime')
-    const queryScheduledDate = searchParams.get('scheduledDate')
-    
-    const [step, setStep] = useState<'select' | 'edit'>(queryTemplate ? 'edit' : 'select')
-    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(queryTemplate || null)
+    const [step, setStep] = useState<'select' | 'edit'>('select')
+    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
     const [sections, setSections] = useState<Section[]>([])
-    const [subject, setSubject] = useState(querySubject || '')
-    const [audience, setAudience] = useState(queryAudience || 'all-users')
-    const [sendTime, setSendTime] = useState(querySendTime || 'now')
-    const [scheduledDate, setScheduledDate] = useState<Date | undefined>(
-        queryScheduledDate ? new Date(queryScheduledDate) : undefined
-    )
+    const [subject, setSubject] = useState('')
     const [editingSection, setEditingSection] = useState<number | null>(null)
     const [isEditingStyle, setIsEditingStyle] = useState(false)
     const [draggedSection, setDraggedSection] = useState<number | null>(null)
-
-    // Initialize template if one is provided in the URL
-    useEffect(() => {
-        if (queryTemplate) {
-            selectTemplate(queryTemplate)
-        }
-    }, [queryTemplate])
 
     const selectTemplate = (templateId: string) => {
         const template = prebuiltTemplates.find(t => t.id === templateId);

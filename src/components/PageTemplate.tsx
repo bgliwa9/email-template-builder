@@ -7,13 +7,14 @@ import { columns } from "@/components/ui/data-table/columns"
 import { usage } from "@/data/data"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { ReactNode } from "react"
 
 interface PageTemplateProps {
     title: string
     primaryCta?: string
     onPrimaryClick?: () => void
     tabs?: { name: string; href: string }[]
-    children?: React.ReactNode
+    children?: ReactNode
 }
 
 export function PageTemplate({

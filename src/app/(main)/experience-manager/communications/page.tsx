@@ -16,7 +16,7 @@ export default function Communications() {
     const router = useRouter()
 
     const handleCreateMessage = () => {
-        router.push("/experience-manager/communications/create-message")
+        router.push("/experience-manager/communications/template-builder")
     }
 
     return (
@@ -25,6 +25,10 @@ export default function Communications() {
             primaryCta="Create Message"
             onPrimaryClick={handleCreateMessage}
             tabs={tabs}
-        />
+        >
+            <div className="p-4">
+                <p className="text-gray-500 dark:text-gray-400">All your messages will appear here.</p>
+            </div>
+        </PageTemplate>
     )
 } 

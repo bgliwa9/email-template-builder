@@ -25,6 +25,10 @@ export default function SentPage() {
             primaryCta="Create Message"
             onPrimaryClick={handleCreateMessage}
             tabs={tabs}
-        />
+        >
+            <div className="p-4">
+                <p className="text-gray-500 dark:text-gray-400">Your sent messages will appear here.</p>
+            </div>
+        </PageTemplate>
     )
 } 
