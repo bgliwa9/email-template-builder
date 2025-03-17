@@ -96,11 +96,13 @@ export default function TemplatesPage() {
     }
 
     const handleEditTemplate = (templateId: string) => {
-        router.push(`/experience-manager/communications/template-builder?template=${templateId}`)
+        // Go directly to the editor with the template and edit mode
+        router.push(`/experience-manager/communications/template-builder/editor?template=${templateId}&mode=edit`)
     }
 
     const handleUseTemplate = (templateId: string) => {
-        router.push(`/experience-manager/communications/template-builder?template=${templateId}&mode=use`)
+        // Go directly to the editor with the template and use mode
+        router.push(`/experience-manager/communications/template-builder/editor?template=${templateId}&mode=use`)
     }
 
     const handleDuplicateTemplate = (templateId: string) => {

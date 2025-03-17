@@ -10,7 +10,7 @@ import { Card } from "@/components/Card"
 import { Input } from "@/components/Input"
 import { Select, SelectContent, SelectGroup, SelectGroupLabel, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
 import { RiAlignCenter, RiAlignLeft, RiAlignRight, RiArrowDownSLine, RiArrowLeftLine, RiArticleLine, RiBold, RiCalendarEventLine, RiCheckLine, RiDeleteBinLine, RiDragMove2Line, RiImage2Line, RiItalic, RiLink, RiListOrdered, RiListUnordered, RiMailLine, RiMarkPenLine, RiPaintFill, RiSave3Line, RiSendPlaneLine, RiUnderline } from "@remixicon/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 
 // Custom Tooltip component
@@ -1951,6 +1951,8 @@ const getContrastRatio = (hexColor: string): string => {
 
 export default function EmailTemplateBuilder() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    
     const [step, setStep] = useState<'select' | 'edit'>('select')
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
     const [sections, setSections] = useState<Section[]>([])
@@ -1958,6 +1960,19 @@ export default function EmailTemplateBuilder() {
     const [editingSection, setEditingSection] = useState<number | null>(null)
     const [isEditingStyle, setIsEditingStyle] = useState(false)
     const [draggedSection, setDraggedSection] = useState<number | null>(null)
+
+    // Get parameters from URL
+    const templateIdParam = searchParams?.get('template')
+    const modeParam = searchParams?.get('mode')
+    const skipSelectionParam = searchParams?.get('skipSelection') === 'true'
+
+    // Handle direct navigation to editor
+    useEffect(() => {
+        if (templateIdParam && skipSelectionParam) {
+            selectTemplate(templateIdParam)
+            setStep('edit')
+        }
+    }, [templateIdParam, skipSelectionParam])
 
     const selectTemplate = (templateId: string) => {
         const template = prebuiltTemplates.find(t => t.id === templateId);
