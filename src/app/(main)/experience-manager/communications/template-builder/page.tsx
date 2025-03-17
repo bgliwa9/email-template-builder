@@ -1725,6 +1725,12 @@ export default function EmailTemplateBuilder() {
         if (templateIdParam && skipSelectionParam) {
             selectTemplate(templateIdParam)
             setStep('edit')
+        } else if (skipSelectionParam) {
+            // Create a default blank template when skipSelection is true but no template is specified
+            setSelectedTemplate('blank')
+            setSections([])
+            setSubject('New Email Template')
+            setStep('edit')
         }
     }, [templateIdParam, skipSelectionParam])
 

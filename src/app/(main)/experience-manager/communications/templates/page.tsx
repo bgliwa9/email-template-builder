@@ -92,7 +92,7 @@ export default function TemplatesPage() {
     const [showDropdownId, setShowDropdownId] = useState<string | null>(null)
 
     const handleCreateTemplate = () => {
-        router.push("/experience-manager/communications/template-builder")
+        router.push("/experience-manager/communications/template-builder?skipSelection=true")
     }
 
     const handleEditTemplate = (templateId: string) => {
