@@ -19,7 +19,7 @@ import {
     RiArrowUpSLine, RiArrowLeftSLine, RiArrowRightSLine, RiCloseLine, RiImageLine, RiFileTextLine, RiCalendarLine, RiAttachment2, RiMapPin2Line, RiBookmarkLine
 } from "@remixicon/react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, Suspense } from "react"
 import { templateData, createDefaultTemplate, type Section as SectionType } from "@/lib/templates"
 
 // Custom Tooltip component
@@ -1623,7 +1623,8 @@ const getContrastRatio = (hexColor: string): string => {
     }
 };
 
-export default function EmailTemplateBuilder() {
+// Create a client component that uses useSearchParams
+function EmailTemplateBuilderClient() {
     const router = useRouter()
     const searchParams = useSearchParams()
     
@@ -2897,4 +2898,20 @@ export default function EmailTemplateBuilder() {
             </div>
         </div >
     );
+}
+
+// Create a wrapper component that uses Suspense
+export default function EmailTemplateBuilder() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading template builder...</p>
+                </div>
+            </div>
+        }>
+            <EmailTemplateBuilderClient />
+        </Suspense>
+    )
 } 
